@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { FaRegBookmark } from "react-icons/fa";
 import axios from "axios";
 
-const API_BASE_URL = "https://stagingcrm.goldensupplementstore.com//api";
+const API_BASE_URL = "https://stagingcrm.goldensupplementstore.com/api";
 
 const SaveButton = ({ questionId }) => {
   const [isSaved, setIsSaved] = useState(false);

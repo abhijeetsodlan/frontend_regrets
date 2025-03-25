@@ -17,7 +17,7 @@ import CategoriesBar from "../../components/CategoriesBar";
 import AddRegretButton from "../../components/AddRegretButton";
 
 // Constants
-const API_BASE_URL = "https://stagingcrm.goldensupplementstore.com//api";
+const API_BASE_URL = "https://stagingcrm.goldensupplementstore.com/api";
 
 const QuestionsPage = () => {
   const [questions, setQuestions] = useState([]);

@@ -39,7 +39,7 @@
           <p className="text-gray-400 text-center mb-6">Sign in with Google to continue</p>
 
           <a
-            href="https://stagingcrm.goldensupplementstore.com//auth/google"
+            href="https://stagingcrm.goldensupplementstore.com/auth/google"
             className="flex items-center justify-center w-full bg-white text-black py-2 px-4 rounded-lg shadow-md hover:bg-gray-200 transition-all"
           >
             <img
