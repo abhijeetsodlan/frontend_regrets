@@ -4,7 +4,7 @@ import QuestionsPage from "./pages/index";
 import RegretDetailPage from "./pages/regretDetailPage";
 import GetStarted from "./pages/getStarted";
 import MyProfile from "./pages/myProfile";
-import Navbar from "../components/Navbar";
+import Navbar from "../components/navbar";
 import AuthSuccess from "../components/AuthSuccess";
 import Login from "../components/LoginPage";
 import Footer from "../components/Footer";

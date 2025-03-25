@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import AddNewQuestion from "./AddNewQuestion";
+import AddNewQuestion from "../components/AddnewQuestion";
 import Login from "./Login";
 
 const CheckAuthModal = ({ isOpen, onClose }) => {
