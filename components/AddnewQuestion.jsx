@@ -14,7 +14,7 @@ export default function CreateQuestionModal({ onClose }) {
     // Fetch categories from API
     const fetchCategories = async () => {
       try {
-        const response = await axios.get("http://127.0.0.1:8000/api/categories");
+        const response = await axios.get("https://stagingcrm.goldensupplementstore.com//api/categories");
         setCategories(response.data.data); // Adjust based on API response structure
       } catch (err) {
         console.error("Error fetching categories:", err);
@@ -53,7 +53,7 @@ export default function CreateQuestionModal({ onClose }) {
       console.log("Request Data:", requestData);
 
       const response = await axios.post(
-        "http://127.0.0.1:8000/api/question",
+        "https://stagingcrm.goldensupplementstore.com//api/question",
         requestData,
         {
           headers: {

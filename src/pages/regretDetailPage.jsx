@@ -10,7 +10,7 @@ import {
   FaPaperPlane,
 } from "react-icons/fa";
 
-const API_BASE_URL = "http://127.0.0.1:8000/api";
+const API_BASE_URL = "https://stagingcrm.goldensupplementstore.com//api";
 import SharePopup from "../../components/SharePopUp";
 
 const RegretDetailPage = () => {

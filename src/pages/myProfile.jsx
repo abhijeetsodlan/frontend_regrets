@@ -22,7 +22,7 @@ const UserProfile = () => {
           throw new Error("User not authenticated");
         }
 
-        const response = await fetch("http://127.0.0.1:8000/api/myprofile", {
+        const response = await fetch("https://stagingcrm.goldensupplementstore.com//api/myprofile", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
