@@ -19,20 +19,6 @@ const RegretDetailPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [replyText, setReplyText] = useState("");
-  const [staticReplies, setStaticReplies] = useState([
-    {
-      id: 1,
-      user: "Jane",
-      text: "That’s tough, sorry you went through that.",
-      created_at: "2025-03-09 08:00:00",
-    },
-    {
-      id: 2,
-      user: "Mike",
-      text: "It’s never too late to apologize.",
-      created_at: "2025-03-09 09:15:00",
-    },
-  ]);
   const navigate = useNavigate();
 
   const token = localStorage.getItem("auth_token");
@@ -103,16 +89,7 @@ const RegretDetailPage = () => {
   const handleReplySubmit = (e) => {
     e.preventDefault();
     if (!replyText.trim()) return;
-
-    const newReply = {
-      id: staticReplies.length + 1,
-      user: storedEmail.split("@")[0],
-      text: replyText,
-      created_at: new Date().toISOString(),
-    };
-
-    setStaticReplies([...staticReplies, newReply]);
-    setReplyText("");
+    // Reply functionality disabled
   };
 
   if (loading) return <p className="text-center text-white py-4">Loading...</p>;
@@ -130,7 +107,6 @@ const RegretDetailPage = () => {
           <FaArrowLeft size={20} />
         </button>
         <div className="bg-gray-900 border-red-400 shadow-red-400 rounded-xl p-6 transition-all duration-300 shadow-lg">
-          {/* Rest of your JSX remains unchanged */}
           <div className="flex items-center mb-4">
             {regret.is_anonymous ? (
               <div className="w-10 h-10 bg-gray-600 text-white flex items-center justify-center rounded-full font-bold text-lg mr-3 shadow-sm">
@@ -172,12 +148,11 @@ const RegretDetailPage = () => {
               {regret.likes_count}
             </button>
             <SharePopup
-                    regretId={regret.id}
-                    regretTitle={regret.title}
-                  />
-            <button className="flex items-center border p-2  rounded-lg transition hover:bg-gray-800 text-white">
+              regretId={regret.id}
+              regretTitle={regret.title}
+            />
+            <button className="flex items-center border p-2 rounded-lg transition hover:bg-gray-800 text-white">
               <FaRegBookmark size={18} className="" />
-             
             </button>
           </div>
 
@@ -187,50 +162,22 @@ const RegretDetailPage = () => {
               value={replyText}
               onChange={(e) => setReplyText(e.target.value)}
               placeholder="Add a comment..."
-              className="w-full p-3 pr-12 rounded-lg bg-gray-700 text-white border border-gray-600 focus:outline-none focus:border-red-500 transition-all duration-200 text-sm"
+              className="w-full p-3 pr-12 rounded-lg bg-gray-700 text-white border border-gray-600 focus:outline-none focus:border-red-500 transition-all duration-200 text-sm opacity-50 cursor-not-allowed"
+              disabled
             />
             <button
               type="submit"
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-red-500 transition"
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-red-500 transition opacity-50 cursor-not-allowed"
+              disabled
             >
               <FaPaperPlane size={16} />
             </button>
           </form>
 
           <div>
-            {staticReplies.length === 0 ? (
-              <p className="text-gray-400 text-sm">No comments yet.</p>
-            ) : (
-              staticReplies.map((reply) => (
-                <div
-                  key={reply.id}
-                  className="mb-4 pb-4 border-b border-gray-700 last:border-b-0"
-                >
-                  <div className="flex items-center">
-                    <div className="w-8 h-8 bg-blue-600 text-white flex items-center justify-center rounded-full font-bold text-sm mr-3 shadow-sm">
-                      {reply.user.charAt(0)}
-                    </div>
-                    <div>
-                      <p className="font-semibold text-sm text-gray-100">
-                        {reply.user}
-                      </p>
-                      <p className="text-xs text-gray-400">
-                        {new Date(reply.created_at).toLocaleDateString(
-                          "en-GB",
-                          {
-                            day: "2-digit",
-                            month: "short",
-                            hour: "2-digit",
-                            minute: "2-digit",
-                          }
-                        )}
-                      </p>
-                    </div>
-                  </div>
-                  <p className="text-gray-200 text-sm mt-1">{reply.text}</p>
-                </div>
-              ))
-            )}
+            <p className="text-gray-400 text-sm italic">
+              The reply feature will be available very soon !
+            </p>
           </div>
         </div>
       </div>

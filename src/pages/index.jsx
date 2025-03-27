@@ -11,7 +11,7 @@ import CheckAuthModal from "../../components/CheckAuth";
 import SharePopup from "../../components/SharePopUp";
 import SaveButton from "../../components/SaveButton";
 import CommentButton from "../../components/CommentButton";
-import HappenedToMeButton from "../../components/HappenedToMeButton";
+// import HappenedToMeButton from "../../components/HappenedToMeButton";
 import LikeButton from "../../components/LikeButton";
 import CategoriesBar from "../../components/CategoriesBar";
 import AddRegretButton from "../../components/AddRegretButton";
@@ -194,7 +194,7 @@ const QuestionsPage = () => {
               </p>
 
               <div className="flex-row justify-between items-center mt-4 text-gray-400">
-                <HappenedToMeButton />
+                {/* <HappenedToMeButton /> */}
                 <div className="flex items-center space-x-2 sm:space-x-4 w-full">
                   <LikeButton
                     questionId={question.id}
