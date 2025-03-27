@@ -6,7 +6,7 @@ export default function GetStarted() {
     <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-gray-800 via-gray-900 to-black text-white">
       <div className="text-center px-4 sm:px-8 max-w-3xl">
         <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold mt-4 tracking-tight flex flex-col sm:flex-row sm:space-x-2 justify-center">
-          <span>Speak it.</span>
+          <span>Write it.</span>
           <span>Read it.</span>
           <span>Feel it.</span>
         </h1>
