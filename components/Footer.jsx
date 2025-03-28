@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import PrivacyPolicy from "../pages/privacyPolicy"; // Note: Adjusted path to match your project structure
+import PrivacyPolicy from "../pages/privacyPolicy"; 
 
 const ABHIJEET_IMAGE_URL =
   "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS_rinx1KYGFy18wkY9gJ5B8GBjg5rv8WaBNg&s"; 
