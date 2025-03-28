@@ -119,7 +119,12 @@ const QuestionsPage = () => {
     setIsModalOpen(true);
   };
 
-  
+  // New handler to refresh questions
+  const handleModalClose = () => {
+    setIsModalOpen(false);
+    // Trigger a refresh by resetting the selected category to itself
+    setSelectedCategory((prev) => prev);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-950 via-gray-900 to-gray-950 text-white flex flex-col items-center py-6">
@@ -134,7 +139,7 @@ const QuestionsPage = () => {
 
       <CheckAuthModal
         isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        onClose={handleModalClose} // Updated to use new handler
       />
 
       {loading ? (

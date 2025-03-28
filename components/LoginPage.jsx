@@ -23,12 +23,8 @@ export default function LoginPage() {
     <div className="min-h-screen bg-gray-900 flex items-center justify-center p-4">
       <div className="bg-gray-800 rounded-2xl shadow-xl max-w-md w-full p-8 transform transition-all duration-300 hover:shadow-2xl">
         {/* Header */}
-        <h2 className="text-2xl font-semibold text-white text-center mb-4">
-          Welcome Back
-        </h2>
         <p className="text-gray-400 text-center mb-6">
-          Please login to continue, it will only take{" "}
-          <span className="text-white font-medium">15 seconds</span>.
+          Please login to continue !
         </p>
 
         {/* Google Login Button */}

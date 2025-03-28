@@ -50,7 +50,7 @@ const SaveButton = ({ questionId }) => {
       } ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
     >
       <FaRegBookmark className="text-lg" />
-      <span>{isSaved ? "Saved" : "Save"}</span>
+     
     </button>
   );
 };

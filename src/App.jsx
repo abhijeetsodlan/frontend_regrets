@@ -4,11 +4,11 @@ import QuestionsPage from "./pages/index";
 import RegretDetailPage from "./pages/regretDetailPage";
 import GetStarted from "./pages/getStarted";
 import MyProfile from "./pages/myProfile";
+import PrivacyPolicy from "./pages/privacyPolicy";
 import Navbar from "../components/navbar";
 import AuthSuccess from "../components/AuthSuccess";
 import Login from "../components/LoginPage";
 import Footer from "../components/Footer";
-
 
 // Layout component for pages with Navbar and Footer
 const DefaultLayout = ({ children }) => (
@@ -47,6 +47,16 @@ function App() {
         <Routes>
           {/* Public Routes (accessible to everyone) */}
           <Route path="/" element={<><GetStarted /><Footer /></>} />
+          
+          {/* Privacy Policy Route (accessible to everyone) */}
+          <Route
+            path="/privacy-policy"
+            element={
+              <DefaultLayout>
+                <PrivacyPolicy />
+              </DefaultLayout>
+            }
+          />
 
           {/* Auth Success Route (no Navbar/Footer, accessible to all) */}
           <Route path="/questions/auth-success" element={<AuthSuccess />} />
