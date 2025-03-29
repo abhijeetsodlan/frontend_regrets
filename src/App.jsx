@@ -24,7 +24,7 @@ const ProtectedRoute = ({ children }) => {
   const isAuthenticated = !!localStorage.getItem("auth_token");
   const location = useLocation();
 
-  if (!isAuthenticated && location.pathname !== "/") {
+  if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
   return children;
@@ -71,27 +71,25 @@ function App() {
             }
           />
 
-          {/* Protected Routes (require authentication) */}
+          {/* Public Regrets Routes (accessible to everyone) */}
           <Route
             path="/regrets"
             element={
-              <ProtectedRoute>
-                <DefaultLayout>
-                  <QuestionsPage />
-                </DefaultLayout>
-              </ProtectedRoute>
+              <DefaultLayout>
+                <QuestionsPage />
+              </DefaultLayout>
             }
           />
           <Route
             path="/regrets/:regret_id"
             element={
-              <ProtectedRoute>
-                <DefaultLayout>
-                  <RegretDetailPage />
-                </DefaultLayout>
-              </ProtectedRoute>
+              <DefaultLayout>
+                <RegretDetailPage />
+              </DefaultLayout>
             }
           />
+
+          {/* Protected Routes (require authentication) */}
           <Route
             path="/myprofile"
             element={

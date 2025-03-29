@@ -58,8 +58,7 @@ const PrivacyPolicy = () => {
               </p>
               <p>
                 We take reasonable steps to protect your personal information
-                from unauthorized access or misuse. However, no method of
-                transmission over the internet is 100% secure.
+                from unauthorized access or misuse.
               </p>
             </section>
 

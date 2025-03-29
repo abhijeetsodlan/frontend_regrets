@@ -9,9 +9,9 @@ import {
   FaArrowLeft,
   FaPaperPlane,
 } from "react-icons/fa";
+import SharePopup from "../../components/SharePopUp";
 
 const API_BASE_URL = "https://stagingcrm.goldensupplementstore.com/api";
-import SharePopup from "../../components/SharePopUp";
 
 const RegretDetailPage = () => {
   const { regret_id } = useParams();
@@ -29,10 +29,9 @@ const RegretDetailPage = () => {
     params: { email: storedEmail },
   });
 
-  // Scroll to top when the component mounts
   useEffect(() => {
     window.scrollTo(0, 0);
-  }, []); // Empty dependency array means this runs once on mount
+  }, []);
 
   useEffect(() => {
     const fetchRegret = async () => {
@@ -53,11 +52,22 @@ const RegretDetailPage = () => {
     fetchRegret();
   }, [regret_id]);
 
+  const checkAuthAndProceed = () => {
+    const isAuthenticated = !!localStorage.getItem("auth_token");
+    if (!isAuthenticated) {
+      navigate("/login");
+      return false;
+    }
+    return true;
+  };
+
   const handleLike = async (e) => {
     e.preventDefault();
-    if (!regret) return;
+    if (!regret || !checkAuthAndProceed()) return;
 
     const newLikedStatus = !regret.liked_by_user;
+    const previousRegret = { ...regret };
+    
     setRegret({
       ...regret,
       liked_by_user: newLikedStatus,
@@ -74,7 +84,7 @@ const RegretDetailPage = () => {
       );
     } catch (error) {
       console.error("Error liking question:", error);
-      setRegret({ ...regret });
+      setRegret(previousRegret);
     }
   };
 
