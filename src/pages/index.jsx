@@ -87,23 +87,11 @@ const QuestionsPage = () => {
     setQuestions([]);
   }, []);
 
-  const checkAuthAndProceed = (actionCallback) => {
-    const isAuthenticated = !!localStorage.getItem("auth_token");
-    if (!isAuthenticated) {
-      navigate("/login");
-      return false;
-    }
-    return true;
-  };
-
   const handleLike = useCallback(
     async (e, questionId) => {
       e.preventDefault();
       e.stopPropagation();
 
-      if (!checkAuthAndProceed()) return;
-
-      const previousLikes = { ...likes };
       setLikes((prev) => ({
         ...prev,
         [questionId]: {
@@ -122,16 +110,13 @@ const QuestionsPage = () => {
         );
       } catch (error) {
         console.error("Error liking question:", error);
-        setLikes(previousLikes);
       }
     },
-    [getApiConfig, likes, navigate]
+    [getApiConfig]
   );
 
   const handleAddRegret = () => {
-    if (checkAuthAndProceed()) {
-      setIsModalOpen(true);
-    }
+    setIsModalOpen(true);
   };
 
   // New handler to refresh questions
@@ -229,7 +214,7 @@ const QuestionsPage = () => {
                     regretId={question.id}
                     regretTitle={question.title}
                   />
-                  {/* <SaveButton questionId={question.id} /> */}
+                  <SaveButton questionId={question.id} />
                 </div>
               </div>
             </div>

@@ -11,17 +11,6 @@ export default function CreateQuestionModal({ onClose }) {
   const [categoriesLoading, setCategoriesLoading] = useState(true); // ✅ Loading state for categories
 
   useEffect(() => {
-
-    const handleAddRegret = () => {
-      const isAuthenticated = !!localStorage.getItem("auth_token");
-      
-      if (!isAuthenticated) {
-        navigate("/login");
-        return;
-      }
-      
-      setIsModalOpen(true);
-    };
     // Fetch categories from API
     const fetchCategories = async () => {
       try {
