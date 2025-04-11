@@ -8,10 +8,10 @@ export default function GetStarted() {
       text: "Scaring off a woman who was as close to perfect as I’ll ever get and was actually into me. Will probably die single now.",
     },
     {
-      text: "On the very first match of IPL, I lost a huge amount of money in stakes. That money could have been used for something much better—something meaningful for me. If you’re thinking about betting, please don’t. It’s not worth it.",
+      text: "I was very curious about armpit fetish. I thought I’d enjoy it, but licking an armpit wasn’t as thrilling as I imagined. Now I can’t forget the taste. 😅",
     },
     {
-      text: "I was very curious about armpit fetish. I thought I’d enjoy it, but licking an armpit wasn’t as thrilling as I imagined. Now I can’t forget the taste. 😅",
+      text: "On the very first match of IPL, I lost a huge amount of money in stakes. That money could have been used for something much better—something meaningful for me. If you’re thinking about betting, please don’t. It’s not worth it.",
     },
   ];
 
