@@ -5,7 +5,7 @@ export default function GetStarted() {
   // Array of regrets to display in floating boxes
   const regrets = [
     {
-      text: "Being a girl in this generation is my biggest regret... 😓😓",
+      text: "Scaring off a woman who was as close to perfect as I’ll ever get and was actually into me. Will probably die single now.",
     },
     {
       text: "On the very first match of IPL, I lost a huge amount of money in stakes. That money could have been used for something much better—something meaningful for me. If you’re thinking about betting, please don’t. It’s not worth it.",
