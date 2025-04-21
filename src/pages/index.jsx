@@ -1,10 +1,7 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import {
-  FaRegBookmark,
-  FaShareAlt,
-} from "react-icons/fa";
+import { FaRegBookmark, FaShareAlt } from "react-icons/fa";
 import {
   IoSadOutline,
   IoHappyOutline,
@@ -119,76 +116,77 @@ const QuestionsPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-gray-950 text-white flex flex-col items-center py-6 px-4 sm:px-8 backdrop-blur-md bg-opacity-90">
+    <>
+      <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-gray-950 text-white flex flex-col items-center py-6 px-4 sm:px-8 backdrop-blur-md bg-opacity-90">
+        {/* Fixed Floating Button + Header */}
+        <AddRegretButton onClick={handleAddRegret} />
 
-      {/* Fixed Floating Button + Header */}
-      <AddRegretButton onClick={handleAddRegret} />
-      <AddRegretButton onClick={handleAddRegret} variant="fixed" />
-
-      {/* Category Filter */}
-      <div className="w-full max-w-4xl mb-6">
-        <CategoriesBar
-          categories={categories}
-          selectedCategory={selectedCategory}
-          onCategoryClick={handleCategoryClick}
-        />
-      </div>
-
-      <CheckAuthModal isOpen={isModalOpen} onClose={handleModalClose} />
-
-      {loading ? (
-        <p className="text-lg font-semibold py-8">Loading...</p>
-      ) : questions.length === 0 ? (
-        <p className="text-gray-400 text-center mt-10">
-          No regrets found in this category.
-        </p>
-      ) : (
-        <div className="w-full max-w-3xl space-y-6">
-          {questions.map((q) => (
-            <div
-              key={q.id}
-              onClick={() => navigate(`/regrets/${q.id}`)}
-              className="bg-[#101010] hover:bg-[#181818] border border-gray-800 rounded-2xl p-6 transition-all cursor-pointer shadow-md hover:shadow-xl group"
-            >
-              {/* Author Section */}
-              <div className="flex items-center mb-4">
-                <div className="w-10 h-10 flex items-center justify-center rounded-full bg-gradient-to-tr from-gray-700 to-gray-500 text-white font-bold text-lg">
-                  {q.is_anonymous ? "🕶️" : q.user?.name?.charAt(0)}
-                </div>
-                <div className="ml-3">
-                  <p className="font-semibold text-lg text-white">
-                    {q.is_anonymous ? "Anonymous" : q.user?.name}
-                  </p>
-                  <p className="text-xs text-gray-400 mt-0.5">
-                    {new Date(q.created_at).toLocaleDateString("en-GB", {
-                      day: "2-digit",
-                      month: "short",
-                    })}
-                  </p>
-                </div>
-              </div>
-
-              {/* Question */}
-              <p className="text-white text-[1.1rem] sm:text-lg font-medium leading-relaxed mb-4">
-                {q.title}
-              </p>
-
-              {/* Action Buttons */}
-              <div className="flex items-center justify-start space-x-4 text-gray-400 text-sm mt-4">
-                <LikeButton
-                  questionId={q.id}
-                  likes={likes}
-                  handleLike={handleLike}
-                />
-                <CommentButton questionId={q.id} onNavigate={navigate} />
-                <SharePopup regretId={q.id} regretTitle={q.title} />
-                <SaveButton questionId={q.id} />
-              </div>
-            </div>
-          ))}
+        {/* Category Filter */}
+        <div className="w-full max-w-4xl mb-6">
+          <CategoriesBar
+            categories={categories}
+            selectedCategory={selectedCategory}
+            onCategoryClick={handleCategoryClick}
+          />
         </div>
-      )}
-    </div>
+
+        <CheckAuthModal isOpen={isModalOpen} onClose={handleModalClose} />
+
+        {loading ? (
+          <p className="text-lg font-semibold py-8">Loading...</p>
+        ) : questions.length === 0 ? (
+          <p className="text-gray-400 text-center mt-10">
+            No regrets found in this category.
+          </p>
+        ) : (
+          <div className="w-full max-w-3xl space-y-6">
+            {questions.map((q) => (
+              <div
+                key={q.id}
+                onClick={() => navigate(`/regrets/${q.id}`)}
+                className="bg-[#101010] hover:bg-[#181818] border border-gray-800 rounded-2xl p-6 transition-all cursor-pointer shadow-md hover:shadow-xl group"
+              >
+                {/* Author Section */}
+                <div className="flex items-center mb-4">
+                  <div className="w-10 h-10 flex items-center justify-center rounded-full bg-gradient-to-tr from-gray-700 to-gray-500 text-white font-bold text-lg">
+                    {q.is_anonymous ? "🕶️" : q.user?.name?.charAt(0)}
+                  </div>
+                  <div className="ml-3">
+                    <p className="font-semibold text-lg text-white">
+                      {q.is_anonymous ? "Anonymous" : q.user?.name}
+                    </p>
+                    <p className="text-xs text-gray-400 mt-0.5">
+                      {new Date(q.created_at).toLocaleDateString("en-GB", {
+                        day: "2-digit",
+                        month: "short",
+                      })}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Question */}
+                <p className="text-white text-[1.1rem] sm:text-lg font-medium leading-relaxed mb-4">
+                  {q.title}
+                </p>
+
+                {/* Action Buttons */}
+                <div className="flex items-center justify-start space-x-4 text-gray-400 text-sm mt-4">
+                  <LikeButton
+                    questionId={q.id}
+                    likes={likes}
+                    handleLike={handleLike}
+                  />
+                  <CommentButton questionId={q.id} onNavigate={navigate} />
+                  <SharePopup regretId={q.id} regretTitle={q.title} />
+                  <SaveButton questionId={q.id} />
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+      <AddRegretButton onClick={handleAddRegret} variant="fixed" />
+    </>
   );
 };
 
