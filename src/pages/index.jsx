@@ -127,7 +127,8 @@ const QuestionsPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-950 via-gray-900 to-gray-950 text-white flex flex-col items-center py-6">
+    <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-gray-950 text-white flex flex-col items-center py-6 px-4 sm:px-8 backdrop-blur-md bg-opacity-90">
+
       <AddRegretButton onClick={handleAddRegret} />
       <AddRegretButton onClick={handleAddRegret} variant="fixed" />
 
@@ -156,7 +157,7 @@ const QuestionsPage = () => {
             <div
               key={question.id}
               onClick={() => navigate(`/regrets/${question.id}`)}
-              className="bg-gray-950 rounded-lg shadow-lg p-6 mb-6 hover:bg-gray-900 transition cursor-pointer border border-gray-600 hover:shadow-xl"
+              className="bg-[#101010] hover:bg-[#181818] border border-gray-800 rounded-2xl p-6 transition-all cursor-pointer shadow-md hover:shadow-xl group"
             >
               {/* User Info */}
               {question.is_anonymous ? (
@@ -194,11 +195,11 @@ const QuestionsPage = () => {
                 )
               )}
 
-              <p className="text-xl font-normal text-white mb-4 text-left">
+              <p className="text-white text-[1.1rem] sm:text-lg font-medium leading-relaxed mb-4">
                 {question.title}
               </p>
 
-              <div className="flex-row justify-between items-center mt-4 text-gray-400">
+              <div className="flex items-center justify-start space-x-4 text-gray-400 text-sm mt-4">
                 {/* <HappenedToMeButton /> */}
                 <div className="flex items-center space-x-2 sm:space-x-4 w-full">
                   <LikeButton
