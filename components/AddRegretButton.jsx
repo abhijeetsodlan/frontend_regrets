@@ -1,4 +1,3 @@
-// src/components/AddRegretButton.jsx
 import React from "react";
 import { FaPlus } from "react-icons/fa";
 
@@ -6,7 +5,7 @@ const AddRegretButton = ({ onClick, variant = "default" }) => {
   if (variant === "fixed") {
     return (
       <button
-        className="fixed bottom-6 right-6 bg-red-400 p-4 rounded-full shadow-xl hover:bg-red-500 transition"
+        className="fixed bottom-6 right-6 bg-gradient-to-r from-red-500 to-red-600 p-4 rounded-full shadow-lg hover:scale-105 transition-transform duration-200"
         onClick={onClick}
       >
         <FaPlus size={24} className="text-white" />
@@ -16,7 +15,7 @@ const AddRegretButton = ({ onClick, variant = "default" }) => {
 
   return (
     <button
-      className="mb-4 bg-red-400 px-6 py-3 rounded-lg shadow-md hover:bg-red-500 transition font-semibold text-white"
+      className="mb-4 bg-gradient-to-r from-red-500 to-red-600 px-6 py-3 rounded-xl shadow hover:scale-105 transition-transform text-white font-bold"
       onClick={onClick}
     >
       + Add Regret

@@ -7,13 +7,13 @@ const API_BASE_URL = "https://stagingcrm.goldensupplementstore.com/api";
 const SaveButton = ({ questionId }) => {
   const [isSaved, setIsSaved] = useState(false);
   const [loading, setLoading] = useState(false);
-  
+
   const token = localStorage.getItem("auth_token");
   const storedEmail = localStorage.getItem("useremail");
 
   const handleSave = async (e) => {
     e.preventDefault();
-    e.stopPropagation(); // Prevent triggering the parent div's onClick
+    e.stopPropagation();
 
     if (loading) return;
 
@@ -35,7 +35,6 @@ const SaveButton = ({ questionId }) => {
       }
     } catch (error) {
       console.error("Error saving post:", error);
-      // Optionally handle error (e.g., show a toast notification)
     } finally {
       setLoading(false);
     }
@@ -45,12 +44,11 @@ const SaveButton = ({ questionId }) => {
     <button
       onClick={handleSave}
       disabled={loading || isSaved}
-      className={`flex items-center space-x-1 text-gray-400 hover:text-white transition-colors ${
-        isSaved ? "text-blue-500" : ""
+      className={`text-white rounded-md px-2 py-1 transition flex items-center justify-center ${
+        isSaved ? "text-blue-400" : "hover:text-blue-500"
       } ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
     >
       <FaRegBookmark className="text-lg" />
-     
     </button>
   );
 };
