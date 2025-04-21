@@ -69,7 +69,7 @@ const SharePopup = ({ regretId, regretTitle }) => {
     <div className="relative">
       <button
         onClick={navigator.share ? shareViaNavigator : togglePopup}
-        className="flex items-center px-3 py-2 rounded-md bg-gray-700 hover:bg-gray-600 text-white transition"
+        className="flex items-center px-3 py-2 rounded-md hover:bg-gray-600 text-white transition"
       >
         <FaShareAlt size={16} />
       </button>

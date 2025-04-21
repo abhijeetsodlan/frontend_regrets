@@ -10,7 +10,7 @@ const CommentButton = ({ questionId, onNavigate }) => {
   return (
     <button
       onClick={handleClick}
-      className="flex items-center bg-gray-700 px-3 py-2 rounded-md text-white hover:bg-gray-600 transition"
+      className="flex items-center px-3 py-2 rounded-md text-white hover:bg-gray-600 transition"
     >
       <FaRegComment size={16} className="mr-1" />
     </button>
