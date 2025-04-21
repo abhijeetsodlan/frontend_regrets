@@ -157,7 +157,7 @@ const QuestionsPage = () => {
             <div
               key={question.id}
               onClick={() => navigate(`/regrets/${question.id}`)}
-              className="bg-[#101010] hover:bg-[#181818] border border-gray-800 rounded-2xl p-6 transition-all cursor-pointer shadow-md hover:shadow-xl group"
+              className="bg-[#101010] hover:bg-[#181818] border border-gray-800 rounded-2xl p-6 transition-all cursor-pointer mb-5 shadow-md hover:shadow-xl group"
             >
               {/* User Info */}
               {question.is_anonymous ? (
