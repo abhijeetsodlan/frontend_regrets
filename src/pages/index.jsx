@@ -119,7 +119,8 @@ const QuestionsPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-950 via-gray-900 to-black text-white flex flex-col items-center py-6 px-4 sm:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-gray-950 text-white flex flex-col items-center py-6 px-4 sm:px-8 backdrop-blur-md bg-opacity-90">
+
       {/* Fixed Floating Button + Header */}
       <AddRegretButton onClick={handleAddRegret} />
       <AddRegretButton onClick={handleAddRegret} variant="fixed" />

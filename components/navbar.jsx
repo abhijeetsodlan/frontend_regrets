@@ -30,7 +30,7 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="w-full bg-gradient-to-r from-gray-900 to-gray-950 text-white py-4 shadow-xl sticky top-0 z-50">
+    <nav className="w-full bg-black/40 backdrop-blur-md text-white py-4 shadow-lg sticky top-0 z-50 border-b border-gray-700/50">
       <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
         {/* Website Name */}
         <Link
@@ -49,7 +49,7 @@ const Navbar = () => {
                 onClick={() => setMenuOpen(!menuOpen)}
               />
               {menuOpen && (
-                <div className="absolute right-0 mt-3 w-48 bg-gray-800 rounded-xl shadow-2xl p-3 transition-all duration-300 transform origin-top scale-100 opacity-100 border border-gray-700">
+                <div className="absolute right-0 mt-3 w-48 bg-black/70 backdrop-blur-md rounded-xl shadow-2xl p-3 transition-all duration-300 transform origin-top scale-100 opacity-100 border border-gray-700">
                   <Link
                     to="/myProfile"
                     className="block w-full text-center px-4 py-2 text-gray-200 hover:bg-gray-700 hover:text-white rounded-lg transition-all duration-200"
@@ -57,7 +57,6 @@ const Navbar = () => {
                   >
                     My Profile
                   </Link>
-                  {/* Replace the logout button with Logout component */}
                   <Logout onLogout={handleLogoutSuccess} />
                 </div>
               )}
@@ -74,7 +73,10 @@ const Navbar = () => {
       </div>
 
       {/* Login Modal */}
-      <LoginModal isOpen={loginModalOpen} onClose={() => setLoginModalOpen(false)} />
+      <LoginModal
+        isOpen={loginModalOpen}
+        onClose={() => setLoginModalOpen(false)}
+      />
     </nav>
   );
 };
