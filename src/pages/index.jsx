@@ -91,7 +91,14 @@ const QuestionsPage = () => {
     async (e, questionId) => {
       e.preventDefault();
       e.stopPropagation();
-
+  
+      // If user is not logged in, show auth modal instead of liking
+      if (!token) {
+        setIsModalOpen(true); // Show login/signup modal
+        return;
+      }
+  
+      // Optimistic UI update
       setLikes((prev) => ({
         ...prev,
         [questionId]: {
@@ -101,7 +108,7 @@ const QuestionsPage = () => {
             : prev[questionId].count + 1,
         },
       }));
-
+  
       try {
         await axios.post(
           `${API_BASE_URL}/questions/${questionId}/like`,
@@ -112,8 +119,9 @@ const QuestionsPage = () => {
         console.error("Error liking question:", error);
       }
     },
-    [getApiConfig]
+    [getApiConfig, token] // make sure token is in dependency array
   );
+  
 
   const handleAddRegret = () => {
     setIsModalOpen(true);
