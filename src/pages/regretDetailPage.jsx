@@ -120,27 +120,31 @@ const RegretDetailPage = () => {
     return <p className="text-center text-gray-400 py-4">Regret not found.</p>;
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white py-8">
-      <div className="w-full max-w-2xl mx-auto px-4">
+    <div className="min-h-screen bg-gray-950 text-white py-10 px-4">
+      <div className="w-full max-w-2xl mx-auto">
         <button
           onClick={() => navigate(-1)}
-          className="text-gray-300 hover:text-white transition mb-4"
+          className="text-gray-400 hover:text-white transition mb-6 flex items-center"
         >
-          <FaArrowLeft size={20} />
+          <FaArrowLeft className="mr-2" />
+          Back
         </button>
-        <div className="bg-gray-900 border-red-400 shadow-red-400 rounded-xl p-6 transition-all duration-300 shadow-lg">
-          <div className="flex items-center mb-4">
-            {regret.is_anonymous ? (
-              <div className="w-10 h-10 bg-gray-600 text-white flex items-center justify-center rounded-full font-bold text-lg mr-3 shadow-sm">
-                🕶️
-              </div>
-            ) : (
-              <div className="w-10 h-10 bg-red-500 text-white flex items-center justify-center rounded-full font-bold text-lg mr-3 shadow-sm">
-                {regret.user.name.charAt(0)}
-              </div>
-            )}
+
+        <div className="bg-gray-900 border border-gray-800 rounded-2xl shadow-xl p-6">
+          {/* Header */}
+          <div className="flex items-center mb-5">
+            <div
+              className={`w-12 h-12 flex items-center justify-center rounded-full font-bold text-lg mr-4 shadow-sm
+                ${
+                  regret.is_anonymous
+                    ? "bg-gray-700 text-white"
+                    : "bg-red-500 text-white"
+                }`}
+            >
+              {regret.is_anonymous ? "🕶️" : regret.user.name.charAt(0)}
+            </div>
             <div>
-              <p className="font-semibold text-lg text-gray-100">
+              <p className="font-semibold text-base sm:text-lg text-gray-100">
                 {regret.is_anonymous ? "Anonymous" : regret.user.name}
               </p>
               <p className="text-xs text-gray-400">
@@ -153,46 +157,46 @@ const RegretDetailPage = () => {
             </div>
           </div>
 
-          <p className="text-xl font-normal text-gray-100 mb-4">
+          {/* Title */}
+          <p className="text-lg sm:text-xl font-normal text-gray-100 mb-6 leading-relaxed">
             {regret.title}
           </p>
 
-          <div className="flex items-center space-x-6 text-gray-400 mb-6">
+          {/* Like & Share */}
+          <div className="flex items-center space-x-5 mb-6">
             <button
               onClick={handleLike}
-              className="flex items-center border px-2 py-1 sm:px-3 sm:py-2 rounded-lg transition hover:bg-gray-800 text-white"
+              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-800 hover:bg-red-500 hover:text-white text-white transition shadow-sm border border-gray-700"
             >
               {regret.liked_by_user ? (
-                <FaHeart size={18} className="mr-2 text-red-500" />
+                <FaHeart className="text-red-500" />
               ) : (
-                <FaRegHeart size={18} className="mr-2" />
+                <FaRegHeart />
               )}
               {regret.likes_count}
             </button>
-            <SharePopup
-              regretId={regret.id}
-              regretTitle={regret.title}
-            />
+            <SharePopup regretId={regret.id} regretTitle={regret.title} />
           </div>
 
-          {/* Reply Input */}
+          {/* Comment Input */}
           <form onSubmit={handleReplySubmit} className="relative mb-4">
             <input
               type="text"
               value={replyText}
               onChange={(e) => setReplyText(e.target.value)}
-              placeholder="Add a comment..."
-              className="w-full p-3 pr-12 rounded-lg bg-gray-700 text-white border border-gray-600 focus:outline-none focus:border-red-500 transition-all duration-200 text-sm"
+              placeholder="Write a thoughtful reply..."
+              className="w-full p-3 pr-12 rounded-xl bg-gray-800 text-sm border border-gray-700 focus:outline-none focus:ring-2 focus:ring-red-500 transition"
             />
             <button
               type="submit"
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-red-500 transition"
+              className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-red-500 transition"
             >
               <FaPaperPlane size={16} />
             </button>
           </form>
 
-          <div className="flex items-center mb-6 text-sm text-gray-300">
+          {/* Anonymous checkbox */}
+          <div className="flex items-center text-sm text-gray-300 mb-6">
             <input
               type="checkbox"
               id="anonymousReply"
@@ -203,22 +207,26 @@ const RegretDetailPage = () => {
             <label htmlFor="anonymousReply">Post Anonymously</label>
           </div>
 
-          {/* Comment List */}
+          {/* Comments */}
           <div className="mt-6 space-y-4">
             {comments.length === 0 ? (
-              <p className="text-gray-400 italic">No comments yet.</p>
+              <p className="text-gray-500 italic">No replies yet.</p>
             ) : (
               comments.map((comment) => (
                 <div
                   key={comment.id}
-                  className="bg-gray-800 p-4 rounded-lg border border-gray-700"
+                  className="bg-gray-800 border border-gray-700 p-4 rounded-xl shadow-sm"
                 >
                   <div className="flex items-center mb-2">
-                    <div className="w-8 h-8 bg-gray-600 rounded-full flex items-center justify-center text-sm font-bold mr-2">
-                      {comment.is_anonymous ? "🕶️" : comment.user?.name?.charAt(0)}
+                    <div className="w-8 h-8 rounded-full bg-gray-700 text-white flex items-center justify-center text-sm font-semibold mr-2">
+                      {comment.is_anonymous
+                        ? "🕶️"
+                        : comment.user?.name?.charAt(0)}
                     </div>
-                    <span className="text-sm font-medium">
-                      {comment.is_anonymous ? "Anonymous" : comment.user?.name}
+                    <span className="text-sm font-medium text-gray-100">
+                      {comment.is_anonymous
+                        ? "Anonymous"
+                        : comment.user?.name}
                     </span>
                   </div>
                   <p className="text-sm text-gray-300">{comment.title}</p>
