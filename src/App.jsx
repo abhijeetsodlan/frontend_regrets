@@ -1,5 +1,11 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+  useLocation,
+} from "react-router-dom";
 import QuestionsPage from "./pages/index";
 import RegretDetailPage from "./pages/regretDetailPage";
 import GetStarted from "./pages/getStarted";
@@ -46,8 +52,16 @@ function App() {
       <div className="min-h-screen bg-gray-900 text-white flex flex-col">
         <Routes>
           {/* Public Routes (accessible to everyone) */}
-          <Route path="/" element={<><GetStarted /><Footer /></>} />
-          
+          <Route
+            path="/"
+            element={
+              <>
+                <GetStarted />
+                <Footer />
+              </>
+            }
+          />
+
           {/* Privacy Policy Route (accessible to everyone) */}
           <Route
             path="/privacy-policy"
@@ -75,11 +89,9 @@ function App() {
           <Route
             path="/regrets"
             element={
-              <ProtectedRoute>
-                <DefaultLayout>
-                  <QuestionsPage />
-                </DefaultLayout>
-              </ProtectedRoute>
+              <DefaultLayout>
+                <QuestionsPage />
+              </DefaultLayout>
             }
           />
           <Route
