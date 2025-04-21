@@ -56,7 +56,7 @@ const RegretDetailPage = () => {
         );
         setComments(response.data.comments); // Assumes API returns { comments: [...] }
       } catch (error) {
-        console.error("Error fetching comments:", error);
+        // console.error("Error fetching comments:", error);
       }
     };
 
@@ -84,7 +84,7 @@ const RegretDetailPage = () => {
         getApiConfig()
       );
     } catch (error) {
-      console.error("Error liking question:", error);
+      // console.error("Error liking question:", error);
     }
   };
 
@@ -110,7 +110,7 @@ const RegretDetailPage = () => {
       );
       setComments(res.data.comments);
     } catch (error) {
-      console.error("Error submitting comment:", error);
+      // console.error("Error submitting comment:", error);
     }
   };
 

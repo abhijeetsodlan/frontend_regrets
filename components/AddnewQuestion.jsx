@@ -17,7 +17,7 @@ export default function CreateQuestionModal({ onClose }) {
         const response = await axios.get("https://stagingcrm.goldensupplementstore.com/api/categories");
         setCategories(response.data.data); // Adjust based on API response structure
       } catch (err) {
-        console.error("Error fetching categories:", err);
+        // console.error("Error fetching categories:", err);
         setError("Failed to load categories.");
       } finally {
         setCategoriesLoading(false);
@@ -50,7 +50,7 @@ export default function CreateQuestionModal({ onClose }) {
         requestData.is_anonymous = 1;
       }
 
-      console.log("Request Data:", requestData);
+      // console.log("Request Data:", requestData);
 
       const response = await axios.post(
         "https://stagingcrm.goldensupplementstore.com/api/question",
@@ -62,10 +62,10 @@ export default function CreateQuestionModal({ onClose }) {
           },
         }
       );
-      console.log("Question Created:", response.data);
+      // console.log("Question Created:", response.data);
       onClose();
     } catch (err) {
-      console.error("Error:", err.response?.data || err);
+      // console.error("Error:", err.response?.data || err);
       setError(err.response?.data?.message || "Failed to create question. Please try again.");
     } finally {
       setLoading(false);

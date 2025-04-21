@@ -34,7 +34,7 @@ const SaveButton = ({ questionId }) => {
         setIsSaved(true);
       }
     } catch (error) {
-      console.error("Error saving post:", error);
+      // console.error("Error saving post:", error);
     } finally {
       setLoading(false);
     }

@@ -75,7 +75,7 @@ const QuestionsPage = () => {
         );
       })
       .catch((error) => {
-        console.error("Error fetching questions:", error);
+        // console.error("Error fetching questions:", error);
         setQuestions([]);
       })
       .finally(() => setLoading(false));
@@ -116,7 +116,7 @@ const QuestionsPage = () => {
           getApiConfig()
         );
       } catch (error) {
-        console.error("Error liking question:", error);
+        // console.error("Error liking question:", error);
       }
     },
     [getApiConfig, token] // make sure token is in dependency array

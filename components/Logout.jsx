@@ -38,7 +38,7 @@ const Logout = ({ onLogout }) => {
       navigate("/login");
       if (onLogout) onLogout();
     } catch (error) {
-      console.error("Logout failed:", error.response?.data || error.message);
+      // console.error("Logout failed:", error.response?.data || error.message);
       localStorage.removeItem("auth_token");
       localStorage.removeItem("useremail");
       navigate("/login");

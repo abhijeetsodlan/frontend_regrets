@@ -27,7 +27,7 @@ const SharePopup = ({ regretId, regretTitle }) => {
         await navigator.share({ title: regretTitle, text: shareText, url: shareUrl });
         setIsOpen(false);
       } catch (error) {
-        console.error("Error sharing:", error);
+        // console.error("Error sharing:", error);
       }
     } else {
       togglePopup(e);
