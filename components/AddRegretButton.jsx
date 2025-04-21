@@ -15,7 +15,7 @@ const AddRegretButton = ({ onClick, variant = "default" }) => {
 
   return (
     <button
-      className="mb-4 bg-gradient-to-r from-red-500 to-red-600 px-6 py-3 rounded-xl shadow hover:scale-105 transition-transform text-white font-bold"
+      className="mb-4 bg-gradient-to-r from-red-400 to-red-500 px-6 py-3 rounded-xl shadow hover:scale-105 transition-transform text-white font-bold"
       onClick={onClick}
     >
       + Add Regret
