@@ -34,14 +34,6 @@ const Footer = () => {
                 </Link>
               </li>
               <li>
-                <Link
-                  to="/write"
-                  className="hover:text-red-500 transition duration-200"
-                >
-                  Share Yours
-                </Link>
-              </li>
-              <li>
                 <a
                   href="mailto:abhijeetsodlan7@gmail.com"
                   className="hover:text-red-500 transition duration-200"
