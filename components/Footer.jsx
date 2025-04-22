@@ -12,9 +12,12 @@ const Footer = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-10 mb-10">
           {/* Brand Section */}
           <div>
-            <h2 className="text-3xl font-extrabold text-red-500 mb-4">Regrets.in</h2>
+            <h2 className="text-3xl font-extrabold text-red-500 mb-4">
+              Regrets.in
+            </h2>
             <p className="text-sm text-gray-600 max-w-xs">
-              Share your regrets, read others’ stories, and connect—anonymously or openly.
+              Share your regrets, read others’ stories, and connect—anonymously
+              or openly.
             </p>
           </div>
 
@@ -23,12 +26,18 @@ const Footer = () => {
             <h3 className="text-md font-semibold mb-3">Quick Links</h3>
             <ul className="space-y-2 text-sm">
               <li>
-                <Link to="/regrets" className="hover:text-red-500 transition duration-200">
+                <Link
+                  to="/regrets"
+                  className="hover:text-red-500 transition duration-200"
+                >
                   Explore Regrets
                 </Link>
               </li>
               <li>
-                <Link to="/write" className="hover:text-red-500 transition duration-200">
+                <Link
+                  to="/write"
+                  className="hover:text-red-500 transition duration-200"
+                >
                   Share Yours
                 </Link>
               </li>
@@ -48,7 +57,10 @@ const Footer = () => {
             <h3 className="text-md font-semibold mb-3">Legal</h3>
             <ul className="space-y-2 text-sm">
               <li>
-                <Link to="/privacy-policy" className="hover:text-red-500 transition duration-200">
+                <Link
+                  to="/privacy-policy"
+                  className="hover:text-red-500 transition duration-200"
+                >
                   Privacy Policy
                 </Link>
               </li>
@@ -57,7 +69,6 @@ const Footer = () => {
 
           {/* Creator Info */}
           <div>
-           
             <a
               href="https://abhijeet.online"
               target="_blank"
@@ -70,9 +81,33 @@ const Footer = () => {
                 className="w-10 h-10 rounded-full border-2 border-red-400 object-cover shadow-sm"
               />
               <p className="ml-3 text-sm text-gray-700">
-                Made by <span className="font-semibold text-gray-900">Abhijeet Sodlan</span>
+                Made by{" "}
+                <span className="font-semibold text-gray-900">
+                  Abhijeet Sodlan
+                </span>
               </p>
             </a>
+          </div>
+          <div className="flex items-start mt-4">
+            <img
+              src="https://ui-avatars.com/api/?name=Piyush+Kumar&background=ef4444&color=fff&rounded=true"
+              alt="Piyush Kumar"
+              className="w-10 h-10 rounded-full border-2 border-red-400 object-cover shadow-sm"
+            />
+            <div className="ml-3 text-sm text-gray-700">
+              <p>
+                <span className="font-semibold text-gray-900">
+                  Piyush Kumar
+                </span>
+              </p>
+              <ul className="text-xs text-gray-500 list-disc list-inside leading-snug mt-1">
+                <li>SEO Manager</li>
+                <li>Chief Strategy Officer</li>
+                <li>Head of Product & Growth</li>
+                <li>Marketing Director</li>
+                <li>Behavioral Data Analyst</li>
+              </ul>
+            </div>
           </div>
         </div>
 
