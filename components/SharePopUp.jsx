@@ -4,7 +4,7 @@ import { FaWhatsapp, FaInstagram, FaTwitter, FaLink, FaTimes, FaShareAlt } from 
 const SharePopup = ({ regretId, regretTitle }) => {
   const [isOpen, setIsOpen] = useState(false);
 
-  const shareUrl = `http://localhost:5173/regrets/${regretId}`;
+  const shareUrl = `https://regrets.in/regrets/${regretId}`;
   const shareText = `Check out this regret: "${regretTitle}" on Regrets.in`;
 
   const togglePopup = (e) => {
