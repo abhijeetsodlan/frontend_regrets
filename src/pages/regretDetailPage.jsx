@@ -116,13 +116,13 @@ const RegretDetailPage = () => {
     } catch (error) {
       if (error.response) {
         console.error("Server Error:", error.response.data);
-        alert("Server Error: " + JSON.stringify(error.response.data));
+        // alert("Server Error: " + JSON.stringify(error.response.data));
       } else if (error.request) {
         console.error("No response:", error.request);
-        alert("No response from server. Please check your network.");
+        // alert("No response from server. Please check your network.");
       } else {
         console.error("Error:", error.message);
-        alert("Error: " + error.message);
+        // alert("Error: " + error.message);
       }
     }
   };
