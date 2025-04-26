@@ -94,7 +94,7 @@ const RegretDetailPage = () => {
 
     try {
       await axios.post(
-        `${API_BASE_URL}/comment`,
+        "https://stagingcrm.goldensupplementstore.com/api/comment",
         {
           title: replyText,
           question_id: regret_id,
