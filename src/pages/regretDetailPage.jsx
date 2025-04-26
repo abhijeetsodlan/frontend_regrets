@@ -99,6 +99,7 @@ const RegretDetailPage = () => {
           title: replyText,
           question_id: regret_id,
           is_anonymous: isAnonymousReply ? 1 : 0,
+          email:storedEmail
         },
         getApiConfig()
       );
