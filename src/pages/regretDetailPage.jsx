@@ -24,7 +24,11 @@ const RegretDetailPage = () => {
   const token = localStorage.getItem("auth_token");
   const storedEmail = localStorage.getItem("useremail");
 
-  const getApiConfig = () => ({
+  const getAuthHeader = () => ({
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
+  const getAuthHeaderWithEmail = () => ({
     headers: { Authorization: `Bearer ${token}` },
     params: { email: storedEmail },
   });
@@ -38,7 +42,7 @@ const RegretDetailPage = () => {
       try {
         const response = await axios.get(
           `${API_BASE_URL}/questions/${regret_id}`,
-          getApiConfig()
+          getAuthHeaderWithEmail()
         );
         setRegret(response.data.question);
         setLoading(false);
@@ -52,11 +56,11 @@ const RegretDetailPage = () => {
       try {
         const response = await axios.get(
           `${API_BASE_URL}/comments/${regret_id}`,
-          getApiConfig()
+          getAuthHeaderWithEmail()
         );
-        setComments(response.data.comments); // Assumes API returns { comments: [...] }
+        setComments(response.data.comments);
       } catch (error) {
-        // console.error("Error fetching comments:", error);
+        console.error("Error fetching comments:", error);
       }
     };
 
@@ -81,10 +85,10 @@ const RegretDetailPage = () => {
       await axios.post(
         `${API_BASE_URL}/questions/${regret_id}/like`,
         {},
-        getApiConfig()
+        getAuthHeader()
       );
     } catch (error) {
-      // console.error("Error liking question:", error);
+      console.error("Error liking question:", error);
     }
   };
 
@@ -94,24 +98,32 @@ const RegretDetailPage = () => {
 
     try {
       await axios.post(
-        "https://stagingcrm.goldensupplementstore.com/api/comment",
+        `${API_BASE_URL}/comment`,
         {
           title: replyText,
           question_id: regret_id,
           is_anonymous: isAnonymousReply ? 1 : 0,
-          email:storedEmail
+          email: storedEmail,
         },
-        getApiConfig()
+        getAuthHeader()
       );
       setReplyText("");
-      // Refetch comments
       const res = await axios.get(
         `${API_BASE_URL}/comments/${regret_id}`,
-        getApiConfig()
+        getAuthHeaderWithEmail()
       );
       setComments(res.data.comments);
     } catch (error) {
-      // console.error("Error submitting comment:", error);
+      if (error.response) {
+        console.error("Server Error:", error.response.data);
+        alert("Server Error: " + JSON.stringify(error.response.data));
+      } else if (error.request) {
+        console.error("No response:", error.request);
+        alert("No response from server. Please check your network.");
+      } else {
+        console.error("Error:", error.message);
+        alert("Error: " + error.message);
+      }
     }
   };
 
