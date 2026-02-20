@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaArrowLeft, FaRegBookmark, FaRegFileAlt, FaAt } from "react-icons/fa";
+import SeoMeta from "../../components/SeoMeta";
 
 const UserProfile = () => {
   const [activeTab, setActiveTab] = useState("uploaded");
@@ -60,32 +61,47 @@ const UserProfile = () => {
   const currentPosts = activeTab === "uploaded" ? uploadedPosts : savedPosts;
   const handleRegretClick = (postId) => navigate(`/regrets/${postId}`);
   const handleBackClick = () => navigate(-1);
+  const seoMeta = (
+    <SeoMeta
+      title="My Profile"
+      description="Manage your posted and saved regrets on your Regrets.in profile."
+      path="/myprofile"
+      noIndex
+    />
+  );
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-slate-950 via-[#090b12] to-slate-950 px-4 py-8 text-white">
-        <div className="mx-auto max-w-3xl space-y-4">
-          <div className="h-28 rounded-2xl border border-white/10 bg-slate-900/55" />
-          <div className="h-12 rounded-2xl border border-white/10 bg-slate-900/55" />
-          <div className="h-20 rounded-xl border border-white/10 bg-slate-900/55" />
-          <div className="h-20 rounded-xl border border-white/10 bg-slate-900/55" />
+      <>
+        {seoMeta}
+        <div className="min-h-screen bg-gradient-to-b from-slate-950 via-[#090b12] to-slate-950 px-4 py-8 text-white">
+          <div className="mx-auto max-w-3xl space-y-4">
+            <div className="h-28 rounded-2xl border border-white/10 bg-slate-900/55" />
+            <div className="h-12 rounded-2xl border border-white/10 bg-slate-900/55" />
+            <div className="h-20 rounded-xl border border-white/10 bg-slate-900/55" />
+            <div className="h-20 rounded-xl border border-white/10 bg-slate-900/55" />
+          </div>
         </div>
-      </div>
+      </>
     );
   }
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-slate-950 via-[#090b12] to-slate-950 px-4 py-8 text-white">
-        <div className="mx-auto max-w-3xl rounded-2xl border border-rose-400/30 bg-rose-500/10 p-6 text-center text-rose-200">
-          Error: {error}
+      <>
+        {seoMeta}
+        <div className="min-h-screen bg-gradient-to-b from-slate-950 via-[#090b12] to-slate-950 px-4 py-8 text-white">
+          <div className="mx-auto max-w-3xl rounded-2xl border border-rose-400/30 bg-rose-500/10 p-6 text-center text-rose-200">
+            Error: {error}
+          </div>
         </div>
-      </div>
+      </>
     );
   }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-950 via-[#090b12] to-slate-950 px-4 py-8 text-white sm:py-10">
+      {seoMeta}
       <div className="mx-auto w-full max-w-3xl">
         <button
           onClick={handleBackClick}

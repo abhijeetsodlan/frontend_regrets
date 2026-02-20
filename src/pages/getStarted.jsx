@@ -1,5 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import SeoMeta from "../../components/SeoMeta";
 
 const regrets = [
   "Scaring off a woman who was as close to perfect as I'll ever get and was actually into me. Will probably die single now.",
@@ -57,7 +58,14 @@ const RegretCard = ({ text, className = "", compact = false }) => (
 
 export default function GetStarted() {
   return (
-    <section className="relative min-h-screen overflow-hidden bg-gradient-to-b from-[#05070d] via-[#060912] to-[#04050a] px-4 py-12 text-white sm:px-8 sm:py-20">
+    <>
+      <SeoMeta
+        title="Share Regrets Anonymously"
+        description="Regrets.in is a safe anonymous space to share your regrets, read real stories, and feel less alone."
+        path="/"
+        keywords="regrets, anonymous confessions, share regrets, emotional support, real stories"
+      />
+      <section className="relative min-h-screen overflow-hidden bg-gradient-to-b from-[#05070d] via-[#060912] to-[#04050a] px-4 py-12 text-white sm:px-8 sm:py-20">
       <style>{`
         @property --line-angle {
           syntax: "<angle>";
@@ -193,6 +201,7 @@ export default function GetStarted() {
           </div>
         </div>
       </div>
-    </section>
+      </section>
+    </>
   );
 }

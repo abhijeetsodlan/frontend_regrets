@@ -1,11 +1,17 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import SeoMeta from "../../components/SeoMeta";
 
 const PrivacyPolicy = () => {
   const navigate = useNavigate();
 
   return (
     <div className="min-h-screen bg-gray-100 py-8 px-4 sm:px-6 lg:px-8">
+      <SeoMeta
+        title="Privacy Policy"
+        description="Read the Regrets.in privacy policy to understand what data is collected and how it is used."
+        path="/privacy-policy"
+      />
       <div className="max-w-3xl mx-auto">
         {/* Back Button */}
         <button

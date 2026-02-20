@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaGoogle } from "react-icons/fa"; // Using react-icons for a cleaner Google icon
+import SeoMeta from "./SeoMeta";
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -20,8 +21,15 @@ export default function LoginPage() {
   }, [navigate]);
 
   return (
-    <div className="min-h-screen bg-gray-900 flex items-center justify-center p-4">
-      <div className="bg-gray-800 rounded-2xl shadow-xl max-w-md w-full p-8 transform transition-all duration-300 hover:shadow-2xl">
+    <>
+      <SeoMeta
+        title="Login"
+        description="Login to Regrets.in to post regrets, save stories, and participate in conversations."
+        path="/login"
+        noIndex
+      />
+      <div className="min-h-screen bg-gray-900 flex items-center justify-center p-4">
+        <div className="bg-gray-800 rounded-2xl shadow-xl max-w-md w-full p-8 transform transition-all duration-300 hover:shadow-2xl">
         {/* Header */}
         <p className="text-gray-400 text-center mb-6">
           Please login to continue !
@@ -49,7 +57,8 @@ export default function LoginPage() {
             </div>
           </div>
         </div>
+        </div>
       </div>
-    </div>
+    </>
   );
 }

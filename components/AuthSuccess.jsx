@@ -1,5 +1,6 @@
 import React,{ useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import SeoMeta from "./SeoMeta";
 
 const AuthSuccess = () => {
   const location = useLocation();
@@ -21,7 +22,17 @@ const AuthSuccess = () => {
     }
   }, [location, navigate]);
 
-  return <div>Logging in...</div>;
+  return (
+    <>
+      <SeoMeta
+        title="Authorizing Login"
+        description="Completing secure sign in on Regrets.in."
+        path="/questions/auth-success"
+        noIndex
+      />
+      <div>Logging in...</div>
+    </>
+  );
 };
 
 export default AuthSuccess;

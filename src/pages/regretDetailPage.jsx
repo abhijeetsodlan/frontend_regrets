@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { FaRegHeart, FaHeart, FaArrowLeft, FaPaperPlane, FaUserSecret } from "react-icons/fa";
 import SharePopup from "../../components/SharePopUp";
+import SeoMeta from "../../components/SeoMeta";
 
 const API_BASE_URL = "http://localhost:3000/api";
 
@@ -110,39 +111,62 @@ const RegretDetailPage = () => {
       month: "short",
       year: "numeric"
     });
+  const regretSnippet = regret?.title || "";
+  const regretTitle =
+    regretSnippet.length > 60 ? `${regretSnippet.slice(0, 60)}...` : regretSnippet;
+  const regretDescription =
+    regretSnippet.length > 145 ? `${regretSnippet.slice(0, 145)}...` : regretSnippet;
+  const seoMeta = (
+    <SeoMeta
+      title={regretTitle || "Regret Details"}
+      description={regretDescription || "Read regret details, reactions, and replies on Regrets.in."}
+      path={`/regrets/${regret_id}`}
+      type="article"
+    />
+  );
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-slate-950 via-[#090b12] to-slate-950 px-4 py-10 text-white">
-        <div className="mx-auto max-w-3xl rounded-2xl border border-white/10 bg-slate-900/50 p-6 text-center text-slate-300">
-          Loading regret...
+      <>
+        {seoMeta}
+        <div className="min-h-screen bg-gradient-to-b from-slate-950 via-[#090b12] to-slate-950 px-4 py-10 text-white">
+          <div className="mx-auto max-w-3xl rounded-2xl border border-white/10 bg-slate-900/50 p-6 text-center text-slate-300">
+            Loading regret...
+          </div>
         </div>
-      </div>
+      </>
     );
   }
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-slate-950 via-[#090b12] to-slate-950 px-4 py-10 text-white">
-        <div className="mx-auto max-w-3xl rounded-2xl border border-rose-400/30 bg-rose-500/10 p-6 text-center text-rose-200">
-          {error}
+      <>
+        {seoMeta}
+        <div className="min-h-screen bg-gradient-to-b from-slate-950 via-[#090b12] to-slate-950 px-4 py-10 text-white">
+          <div className="mx-auto max-w-3xl rounded-2xl border border-rose-400/30 bg-rose-500/10 p-6 text-center text-rose-200">
+            {error}
+          </div>
         </div>
-      </div>
+      </>
     );
   }
 
   if (!regret) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-slate-950 via-[#090b12] to-slate-950 px-4 py-10 text-white">
-        <div className="mx-auto max-w-3xl rounded-2xl border border-white/10 bg-slate-900/50 p-6 text-center text-slate-400">
-          Regret not found.
+      <>
+        {seoMeta}
+        <div className="min-h-screen bg-gradient-to-b from-slate-950 via-[#090b12] to-slate-950 px-4 py-10 text-white">
+          <div className="mx-auto max-w-3xl rounded-2xl border border-white/10 bg-slate-900/50 p-6 text-center text-slate-400">
+            Regret not found.
+          </div>
         </div>
-      </div>
+      </>
     );
   }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-950 via-[#090b12] to-slate-950 px-4 py-8 text-white sm:py-10">
+      {seoMeta}
       <div className="mx-auto w-full max-w-3xl">
         <button
           onClick={() => navigate(-1)}

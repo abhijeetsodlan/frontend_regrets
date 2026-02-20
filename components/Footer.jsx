@@ -2,7 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 
 const ABHIJEET_IMAGE_URL =
-  "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS_rinx1KYGFy18wkY9gJ5B8GBjg5rv8WaBNg&s";
+  "https://pbs.twimg.com/profile_images/1917982995052691456/SmbTOeLq_400x400.jpg";
 
 const Footer = () => {
   return (
@@ -16,8 +16,7 @@ const Footer = () => {
               Regrets.in
             </h2>
             <p className="text-sm text-gray-600 max-w-xs">
-              Share your regrets, read others’ stories, and connect anonymously
-              or openly.
+              Share your regrets. Read real stories. Connect with others - anonymously or openly.
             </p>
           </div>
 
@@ -62,7 +61,7 @@ const Footer = () => {
           {/* Creator Info */}
           <div>
             <a
-              href="https://abhijeet.online"
+              href="https://abhijeethere.netlify.app"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center hover:opacity-90 transition duration-200"
@@ -84,8 +83,9 @@ const Footer = () => {
 
         {/* Bottom Text */}
         <div className="border-t border-gray-300 pt-6 text-center text-xs text-gray-500">
-          © {new Date().getFullYear()} Regrets.in — All rights reserved.
+          © {new Date().getFullYear()} 
         </div>
+        
       </div>
     </footer>
   );

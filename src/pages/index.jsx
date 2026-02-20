@@ -9,6 +9,7 @@ import CommentButton from "../../components/CommentButton";
 import LikeButton from "../../components/LikeButton";
 import CategoriesBar from "../../components/CategoriesBar";
 import AddRegretButton from "../../components/AddRegretButton";
+import SeoMeta from "../../components/SeoMeta";
 
 const API_BASE_URL = "http://localhost:3000/api";
 
@@ -121,6 +122,12 @@ const QuestionsPage = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-950 via-[#090b12] to-slate-950 text-white">
+      <SeoMeta
+        title="Explore Regrets"
+        description="Browse anonymous regrets across categories, react, comment, and share meaningful stories on Regrets.in."
+        path="/regrets"
+        keywords="explore regrets, anonymous stories, confessions feed, regrets community"
+      />
       <AddRegretButton onClick={handleAddRegret} variant="fixed" />
 
       <CheckAuthModal isOpen={isModalOpen} onClose={handleModalClose} />
