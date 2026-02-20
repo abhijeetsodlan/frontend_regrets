@@ -4,6 +4,20 @@
 html, body {
   background-color: #111827; 
 }
+
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }

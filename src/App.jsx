@@ -11,6 +11,7 @@ import RegretDetailPage from "./pages/regretDetailPage";
 import GetStarted from "./pages/getStarted";
 import MyProfile from "./pages/myProfile";
 import PrivacyPolicy from "./pages/privacyPolicy";
+import SmoothScroll from "./SmoothScroll";
 import Navbar from "../components/navbar";
 import AuthSuccess from "../components/AuthSuccess";
 import Login from "../components/LoginPage";
@@ -49,6 +50,7 @@ const PublicRoute = ({ children }) => {
 function App() {
   return (
     <Router>
+      <SmoothScroll />
       <div className="min-h-screen bg-gray-900 text-white flex flex-col">
         <Routes>
           {/* Public Routes (accessible to everyone) */}
