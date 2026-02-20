@@ -9,7 +9,7 @@ import {
 } from "react-icons/fa";
 import SharePopup from "../../components/SharePopUp";
 
-const API_BASE_URL = "https://stagingcrm.goldensupplementstore.com/api";
+const API_BASE_URL = "http://localhost:3000/api";
 
 const RegretDetailPage = () => {
   const { regret_id } = useParams();

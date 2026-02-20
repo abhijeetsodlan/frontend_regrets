@@ -16,13 +16,13 @@ const Logout = ({ onLogout }) => {
       }
 
       // Fetch CSRF token
-      await axios.get("https://stagingcrm.goldensupplementstore.com/sanctum/csrf-cookie", {
+      await axios.get("http://localhost:3000/sanctum/csrf-cookie", {
         withCredentials: true,
       });
 
       // Logout request
       await axios.post(
-        "https://stagingcrm.goldensupplementstore.com/api/logout",
+        "http://localhost:3000/api/logout",
         {},
         {
           headers: {

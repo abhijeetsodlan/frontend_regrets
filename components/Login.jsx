@@ -16,11 +16,15 @@
       const params = new URLSearchParams(window.location.search);
       const token = params.get("token");
       const user = params.get("user");
+      const email = params.get("email");
 
       if (token) {
         localStorage.setItem("auth_token", token);
         localStorage.setItem("user", user);
-        navigate("/questions"); 
+        if (email) {
+          localStorage.setItem("useremail", email);
+        }
+        navigate("/regrets");
       }
     }, [navigate]);
 
@@ -39,7 +43,7 @@
           <p className="text-gray-400 text-center mb-6">Sign in with Google to continue</p>
 
           <a
-            href="https://stagingcrm.goldensupplementstore.com/auth/google"
+            href="http://localhost:3000/auth/google"
             className="flex items-center justify-center w-full bg-white text-black py-2 px-4 rounded-lg shadow-md hover:bg-gray-200 transition-all"
           >
             <img

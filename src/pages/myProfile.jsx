@@ -22,7 +22,7 @@ const UserProfile = () => {
         }
 
         const response = await fetch(
-          "https://stagingcrm.goldensupplementstore.com/api/myprofile",
+          "http://localhost:3000/api/myprofile",
           {
             method: "POST",
             headers: {

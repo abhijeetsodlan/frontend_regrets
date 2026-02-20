@@ -17,7 +17,7 @@ import CategoriesBar from "../../components/CategoriesBar";
 import AddRegretButton from "../../components/AddRegretButton";
 
 // Constants
-const API_BASE_URL = "https://stagingcrm.goldensupplementstore.com/api";
+const API_BASE_URL = "http://localhost:3000/api";
 
 const QuestionsPage = () => {
   const [questions, setQuestions] = useState([]);
@@ -83,8 +83,7 @@ const QuestionsPage = () => {
 
   // Handlers
   const handleCategoryClick = useCallback((categoryId) => {
-    setSelectedCategory(categoryId);
-    setQuestions([]);
+    setSelectedCategory((prev) => (prev === categoryId ? prev : categoryId));
   }, []);
 
   const handleLike = useCallback(
