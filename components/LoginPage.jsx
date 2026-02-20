@@ -30,7 +30,7 @@ export default function LoginPage() {
         {/* Google Login Button */}
         <a
           href="http://localhost:3000/auth/google"
-          className="flex items-center justify-center w-full bg-white text-gray-900 py-3 px-6 rounded-lg shadow-md hover:bg-gray-100 hover:scale-105 transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50"
+          className="flex items-center justify-center w-full bg-white text-gray-900 py-3 px-6 rounded-lg shadow-md hover:bg-gray-100 hover:scale-105 transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-rose-500 focus:ring-opacity-50"
         >
           <FaGoogle className="text-xl mr-3 " />
           <span className="font-medium">Continue with Google</span>

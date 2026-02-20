@@ -124,7 +124,7 @@ const RegretDetailPage = () => {
   if (error) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-slate-950 via-[#090b12] to-slate-950 px-4 py-10 text-white">
-        <div className="mx-auto max-w-3xl rounded-2xl border border-red-500/30 bg-red-500/10 p-6 text-center text-red-300">
+        <div className="mx-auto max-w-3xl rounded-2xl border border-rose-400/30 bg-rose-500/10 p-6 text-center text-rose-200">
           {error}
         </div>
       </div>
@@ -159,7 +159,7 @@ const RegretDetailPage = () => {
                 <FaUserSecret size={18} />
               </div>
             ) : (
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-red-500 text-base font-bold text-white">
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-rose-500 text-base font-bold text-white">
                 {regret.user?.name?.charAt(0) || "U"}
               </div>
             )}
@@ -181,11 +181,11 @@ const RegretDetailPage = () => {
               onClick={handleLike}
               className={`inline-flex h-10 items-center gap-2 rounded-full border px-3 text-sm font-medium transition ${
                 regret.liked_by_user
-                  ? "border-red-400/40 bg-red-500/15 text-red-300"
+                  ? "border-rose-300/40 bg-rose-500/15 text-rose-200"
                   : "border-white/10 bg-slate-900/55 text-slate-300 hover:border-white/20 hover:bg-slate-800 hover:text-white"
               }`}
             >
-              {regret.liked_by_user ? <FaHeart size={14} className="text-red-400" /> : <FaRegHeart size={14} />}
+              {regret.liked_by_user ? <FaHeart size={14} className="text-rose-300" /> : <FaRegHeart size={14} />}
               <span>{regret.likes_count || 0}</span>
             </button>
 
@@ -200,7 +200,7 @@ const RegretDetailPage = () => {
                 placeholder="Write a thoughtful reply..."
                 rows={3}
                 maxLength={280}
-                className="w-full resize-none rounded-xl border border-white/10 bg-slate-900/70 px-4 py-3 text-sm text-white outline-none transition placeholder:text-slate-500 focus:border-red-400/50 focus:ring-2 focus:ring-red-500/25"
+                className="w-full resize-none rounded-xl border border-white/10 bg-slate-900/70 px-4 py-3 text-sm text-white outline-none transition placeholder:text-slate-500 focus:border-rose-300/50 focus:ring-2 focus:ring-rose-400/25"
               />
 
               <div className="flex flex-wrap items-center justify-between gap-3">
@@ -209,7 +209,7 @@ const RegretDetailPage = () => {
                     type="checkbox"
                     checked={isAnonymousReply}
                     onChange={() => setIsAnonymousReply(!isAnonymousReply)}
-                    className="h-4 w-4 accent-red-500"
+                    className="h-4 w-4 accent-rose-500"
                   />
                   Post anonymously
                 </label>
@@ -217,7 +217,7 @@ const RegretDetailPage = () => {
                 <button
                   type="submit"
                   disabled={submittingReply || !replyText.trim()}
-                  className="inline-flex h-10 items-center gap-2 rounded-full bg-gradient-to-r from-red-500 to-red-400 px-5 text-sm font-semibold text-white shadow-[0_10px_24px_rgba(239,68,68,0.35)] transition hover:from-red-600 hover:to-red-500 disabled:cursor-not-allowed disabled:opacity-60"
+                  className="inline-flex h-10 items-center gap-2 rounded-full bg-gradient-to-r from-rose-500 to-rose-400 px-5 text-sm font-semibold text-white shadow-[0_10px_24px_rgba(251,113,133,0.3)] transition hover:from-rose-600 hover:to-rose-500 disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   <FaPaperPlane size={12} />
                   {submittingReply ? "Posting..." : "Post Reply"}
@@ -252,7 +252,7 @@ const RegretDetailPage = () => {
                         <FaUserSecret size={12} />
                       </div>
                     ) : (
-                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-rose-500 text-xs font-bold text-white">
                         {comment.user?.name?.charAt(0) || "U"}
                       </div>
                     )}

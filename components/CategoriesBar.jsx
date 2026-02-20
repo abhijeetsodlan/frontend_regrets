@@ -6,8 +6,8 @@ const CategoriesBar = ({ categories, selectedCategory, onCategoryClick }) => {
       onClick={() => onCategoryClick(id)}
       className={`whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium transition-all sm:text-base ${
         isSelected
-          ? "border border-red-400/40 bg-red-500 text-white shadow-[0_8px_22px_rgba(239,68,68,0.35)]"
-          : "border border-white/10 bg-slate-900/70 text-slate-300 hover:border-red-300/30 hover:bg-slate-800 hover:text-white"
+          ? "border border-rose-300/40 bg-rose-500/90 text-white shadow-[0_8px_22px_rgba(251,113,133,0.26)]"
+          : "border border-white/10 bg-slate-900/70 text-slate-300 hover:border-rose-300/25 hover:bg-slate-800 hover:text-white"
       }`}
     >
       {name}
@@ -35,4 +35,3 @@ const CategoriesBar = ({ categories, selectedCategory, onCategoryClick }) => {
 };
 
 export default CategoriesBar;
-

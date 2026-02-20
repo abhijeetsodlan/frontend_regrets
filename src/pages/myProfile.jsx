@@ -77,7 +77,7 @@ const UserProfile = () => {
   if (error) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-slate-950 via-[#090b12] to-slate-950 px-4 py-8 text-white">
-        <div className="mx-auto max-w-3xl rounded-2xl border border-red-500/30 bg-red-500/10 p-6 text-center text-red-300">
+        <div className="mx-auto max-w-3xl rounded-2xl border border-rose-400/30 bg-rose-500/10 p-6 text-center text-rose-200">
           Error: {error}
         </div>
       </div>
@@ -89,19 +89,19 @@ const UserProfile = () => {
       <div className="mx-auto w-full max-w-3xl">
         <button
           onClick={handleBackClick}
-          className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/10 bg-slate-900/60 px-4 py-2 text-sm text-slate-300 transition hover:border-white/20 hover:bg-slate-800 hover:text-white"
+          className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/10 bg-slate-900/60 px-4 py-2 text-sm text-slate-300 transition hover:border-rose-300/30 hover:bg-slate-800 hover:text-rose-100"
         >
           <FaArrowLeft size={12} />
           Back
         </button>
 
         <section className="relative overflow-hidden rounded-2xl border border-white/10 bg-slate-900/70 p-5 shadow-[0_18px_45px_rgba(0,0,0,0.35)] backdrop-blur sm:p-6">
-          <div className="pointer-events-none absolute -right-16 -top-16 h-44 w-44 rounded-full bg-red-500/15 blur-3xl" />
-          <div className="pointer-events-none absolute -left-16 -bottom-16 h-40 w-40 rounded-full bg-cyan-500/10 blur-3xl" />
+          <div className="pointer-events-none absolute -right-16 -top-16 h-44 w-44 rounded-full bg-rose-400/14 blur-3xl" />
+          <div className="pointer-events-none absolute -left-16 -bottom-16 h-40 w-40 rounded-full bg-rose-300/10 blur-3xl" />
 
           <div className="relative flex flex-col items-start justify-between gap-5 sm:flex-row sm:items-center">
             <div className="flex items-center gap-4">
-              <div className="relative flex h-16 w-16 items-center justify-center rounded-full border border-red-300/40 bg-gradient-to-br from-red-500/25 to-rose-500/10 text-2xl font-bold text-red-200 shadow-[0_8px_25px_rgba(239,68,68,0.3)]">
+              <div className="relative flex h-16 w-16 items-center justify-center rounded-full border border-rose-200/35 bg-gradient-to-br from-rose-500/20 to-rose-300/10 text-2xl font-bold text-rose-100 shadow-[0_8px_25px_rgba(251,113,133,0.24)]">
                 <span className="absolute inset-0 rounded-full border border-white/10" />
                 {nameInitial}
               </div>
@@ -122,7 +122,7 @@ const UserProfile = () => {
               onClick={() => setActiveTab("uploaded")}
               className={`inline-flex h-11 flex-1 items-center justify-center gap-2 rounded-lg text-sm font-medium transition ${
                 activeTab === "uploaded"
-                  ? "bg-gradient-to-r from-red-500/30 to-rose-500/20 text-red-100 shadow-[0_8px_20px_rgba(239,68,68,0.25)]"
+                  ? "bg-gradient-to-r from-rose-500/25 to-rose-300/20 text-rose-100 shadow-[0_8px_20px_rgba(251,113,133,0.2)]"
                   : "text-slate-300 hover:bg-white/5 hover:text-white"
               }`}
             >
@@ -133,7 +133,7 @@ const UserProfile = () => {
               onClick={() => setActiveTab("saved")}
               className={`inline-flex h-11 flex-1 items-center justify-center gap-2 rounded-lg text-sm font-medium transition ${
                 activeTab === "saved"
-                  ? "bg-gradient-to-r from-red-500/30 to-rose-500/20 text-red-100 shadow-[0_8px_20px_rgba(239,68,68,0.25)]"
+                  ? "bg-gradient-to-r from-rose-500/25 to-rose-300/20 text-rose-100 shadow-[0_8px_20px_rgba(251,113,133,0.2)]"
                   : "text-slate-300 hover:bg-white/5 hover:text-white"
               }`}
             >
@@ -149,13 +149,13 @@ const UserProfile = () => {
               <article
                 key={post.id}
                 onClick={() => handleRegretClick(post.id)}
-                className="group cursor-pointer rounded-xl border border-white/10 bg-slate-900/60 p-4 shadow-[0_14px_35px_rgba(0,0,0,0.28)] transition-all duration-300 hover:-translate-y-0.5 hover:border-red-400/30 hover:bg-slate-900/80"
+                className="group cursor-pointer rounded-xl border border-white/10 bg-slate-900/60 p-4 shadow-[0_14px_35px_rgba(0,0,0,0.28)] transition-all duration-300 hover:-translate-y-0.5 hover:border-rose-300/30 hover:bg-slate-900/80"
               >
                 <div className="flex items-center justify-between gap-4">
                   <p className="line-clamp-2 text-sm leading-6 text-slate-200 sm:text-base">
                     {post.title}
                   </p>
-                  <span className="rounded-full border border-white/10 bg-slate-950/60 px-3 py-1 text-xs text-slate-400 transition group-hover:border-red-300/35 group-hover:text-slate-200">
+                  <span className="rounded-full border border-white/10 bg-slate-950/60 px-3 py-1 text-xs text-slate-400 transition group-hover:border-rose-300/35 group-hover:text-slate-200">
                     Open
                   </span>
                 </div>

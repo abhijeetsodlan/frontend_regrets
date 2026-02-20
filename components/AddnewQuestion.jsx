@@ -73,7 +73,7 @@ export default function CreateQuestionModal({ onClose }) {
       />
 
       <div className="relative w-full max-w-md rounded-2xl border border-white/10 bg-slate-950/95 p-5 text-white shadow-[0_24px_60px_rgba(0,0,0,0.55)] sm:p-6">
-        <div className="pointer-events-none absolute left-[-45px] top-[-45px] h-36 w-36 rounded-full bg-red-500/20 blur-3xl" />
+        <div className="pointer-events-none absolute left-[-45px] top-[-45px] h-36 w-36 rounded-full bg-rose-400/16 blur-3xl" />
         <div className="pointer-events-none absolute bottom-[-40px] right-[-30px] h-32 w-32 rounded-full bg-cyan-500/10 blur-3xl" />
 
         <div className="relative mb-3 flex items-center justify-end">
@@ -103,7 +103,7 @@ export default function CreateQuestionModal({ onClose }) {
                 onChange={(e) => setTitle(e.target.value)}
                 rows={4}
                 maxLength={300}
-                className="w-full rounded-xl border border-white/10 bg-slate-900/70 px-4 py-3 text-base text-white outline-none transition placeholder:text-slate-500 focus:border-red-400/50 focus:ring-2 focus:ring-red-500/25"
+                className="w-full rounded-xl border border-white/10 bg-slate-900/70 px-4 py-3 text-base text-white outline-none transition placeholder:text-slate-500 focus:border-rose-300/50 focus:ring-2 focus:ring-rose-400/25"
                 required
               />
               <div className="mt-1 text-right text-xs text-slate-500">{charCount}/300</div>
@@ -117,7 +117,7 @@ export default function CreateQuestionModal({ onClose }) {
                 id="regret-category"
                 value={categoryId}
                 onChange={(e) => setCategoryId(e.target.value)}
-                className="w-full rounded-xl border border-white/10 bg-slate-900/70 px-4 py-3 text-base text-white outline-none transition focus:border-red-400/50 focus:ring-2 focus:ring-red-500/25"
+                className="w-full rounded-xl border border-white/10 bg-slate-900/70 px-4 py-3 text-base text-white outline-none transition focus:border-rose-300/50 focus:ring-2 focus:ring-rose-400/25"
                 required
               >
                 <option value="" disabled>
@@ -136,14 +136,14 @@ export default function CreateQuestionModal({ onClose }) {
                 type="checkbox"
                 checked={isAnonymous}
                 onChange={(e) => setIsAnonymous(e.target.checked)}
-                className="h-4 w-4 accent-red-500"
+                className="h-4 w-4 accent-rose-500"
               />
               <FaUserSecret size={14} className="text-slate-400" />
               Post as anonymous
             </label>
 
             {error && (
-              <div className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
+              <div className="rounded-xl border border-rose-400/30 bg-rose-500/10 px-4 py-3 text-sm text-rose-200">
                 {error}
               </div>
             )}
@@ -158,7 +158,7 @@ export default function CreateQuestionModal({ onClose }) {
               </button>
               <button
                 type="submit"
-                className="inline-flex h-11 min-w-[138px] items-center justify-center rounded-full bg-gradient-to-r from-red-500 via-rose-500 to-orange-400 px-6 text-sm font-semibold tracking-wide text-white shadow-[0_10px_24px_rgba(239,68,68,0.35)] transition hover:from-red-600 hover:via-rose-600 hover:to-orange-500 disabled:cursor-not-allowed disabled:opacity-60"
+                className="inline-flex h-11 min-w-[138px] items-center justify-center rounded-full bg-gradient-to-r from-rose-500 via-rose-400 to-orange-300 px-6 text-sm font-semibold tracking-wide text-white shadow-[0_10px_24px_rgba(251,113,133,0.3)] transition hover:from-rose-600 hover:via-rose-500 hover:to-orange-400 disabled:cursor-not-allowed disabled:opacity-60"
                 disabled={loading}
               >
                 {loading ? "Submitting..." : "Post Regret"}

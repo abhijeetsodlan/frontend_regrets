@@ -150,7 +150,7 @@ const QuestionsPage = () => {
               <article
                 key={question.id}
                 onClick={() => navigate(`/regrets/${question.id}`)}
-                className="group cursor-pointer rounded-2xl border border-white/10 bg-slate-900/60 p-5 shadow-[0_18px_45px_rgba(0,0,0,0.35)] backdrop-blur transition-all duration-300 hover:-translate-y-0.5 hover:border-red-400/40 hover:bg-slate-900/85 sm:p-6"
+                className="group cursor-pointer rounded-2xl border border-white/10 bg-slate-900/60 p-5 shadow-[0_18px_45px_rgba(0,0,0,0.35)] backdrop-blur transition-all duration-300 hover:-translate-y-0.5 hover:border-rose-300/35 hover:bg-slate-900/85 sm:p-6"
               >
                 {question.is_anonymous ? (
                   <div className="mb-4 flex items-center">
@@ -164,7 +164,7 @@ const QuestionsPage = () => {
                 ) : (
                   question.user && (
                     <div className="mb-4 flex items-center">
-                      <div className="flex h-11 w-11 items-center justify-center rounded-full bg-red-500 text-base font-bold text-white">
+                      <div className="flex h-11 w-11 items-center justify-center rounded-full bg-rose-500 text-base font-bold text-white">
                         {question.user.name.charAt(0)}
                       </div>
                       <div className="ml-3">

@@ -10,7 +10,7 @@ const PrivacyPolicy = () => {
         {/* Back Button */}
         <button
           onClick={() => navigate(-1)}
-          className="mb-6 flex items-center text-red-500 hover:text-red-600 transition-colors duration-200"
+          className="mb-6 flex items-center text-rose-500 hover:text-rose-600 transition-colors duration-200"
         >
           <svg
             className="w-5 h-5 mr-2"

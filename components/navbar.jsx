@@ -35,7 +35,7 @@ const Navbar = () => {
         {/* Website Name */}
         <Link
           to="/"
-          className="text-2xl font-bold text-red-500 hover:text-red-400 transition-all duration-300"
+          className="text-2xl font-bold text-rose-500 hover:text-rose-400 transition-all duration-300"
         >
           Regrets.in
         </Link>
@@ -45,7 +45,7 @@ const Navbar = () => {
           {isLoggedIn ? (
             <div className="relative">
               <FaUserCircle
-                className="text-3xl cursor-pointer hover:text-red-400 transition-all duration-300"
+                className="text-3xl cursor-pointer hover:text-rose-400 transition-all duration-300"
                 onClick={() => setMenuOpen(!menuOpen)}
               />
               {menuOpen && (
@@ -63,7 +63,7 @@ const Navbar = () => {
             </div>
           ) : (
             <button
-              className="bg-red-500 px-6 py-2 rounded-full font-medium text-white hover:bg-red-600 shadow-lg transition-all duration-300 hover:shadow-red-500/20"
+              className="bg-rose-500 px-6 py-2 rounded-full font-medium text-white hover:bg-rose-600 shadow-lg transition-all duration-300 hover:shadow-rose-500/20"
               onClick={() => setLoginModalOpen(true)}
             >
               Login

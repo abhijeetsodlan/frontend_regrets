@@ -12,7 +12,7 @@ const Footer = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-10 mb-10">
           {/* Brand Section */}
           <div>
-            <h2 className="text-3xl font-extrabold text-red-500 mb-4">
+            <h2 className="text-3xl font-extrabold text-rose-500 mb-4">
               Regrets.in
             </h2>
             <p className="text-sm text-gray-600 max-w-xs">
@@ -28,7 +28,7 @@ const Footer = () => {
               <li>
                 <Link
                   to="/regrets"
-                  className="hover:text-red-500 transition duration-200"
+                  className="hover:text-rose-500 transition duration-200"
                 >
                   Explore Regrets
                 </Link>
@@ -36,7 +36,7 @@ const Footer = () => {
               <li>
                 <a
                   href="mailto:abhijeetsodlan7@gmail.com"
-                  className="hover:text-red-500 transition duration-200"
+                  className="hover:text-rose-500 transition duration-200"
                 >
                   Support
                 </a>
@@ -51,7 +51,7 @@ const Footer = () => {
               <li>
                 <Link
                   to="/privacy-policy"
-                  className="hover:text-red-500 transition duration-200"
+                  className="hover:text-rose-500 transition duration-200"
                 >
                   Privacy Policy
                 </Link>
@@ -70,7 +70,7 @@ const Footer = () => {
               <img
                 src={ABHIJEET_IMAGE_URL}
                 alt="Abhijeet Sodlan"
-                className="w-10 h-10 rounded-full border-2 border-red-400 object-cover shadow-sm"
+                className="w-10 h-10 rounded-full border-2 border-rose-400 object-cover shadow-sm"
               />
               <p className="ml-3 text-sm text-gray-700">
                 Made by{" "}

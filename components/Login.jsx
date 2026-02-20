@@ -52,8 +52,8 @@ const LoginModal = ({ isOpen, onClose }) => {
         </button>
 
         <div className="mb-6 text-center">
-          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-red-500/15 ring-1 ring-red-400/30">
-            <span className="text-xl text-red-400">R</span>
+          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-rose-500/15 ring-1 ring-rose-400/30">
+            <span className="text-xl text-rose-400">R</span>
           </div>
           <h2 className="text-2xl font-bold tracking-tight">Welcome back</h2>
           <p className="mt-2 text-sm text-slate-300">
@@ -63,7 +63,7 @@ const LoginModal = ({ isOpen, onClose }) => {
 
         <a
           href="http://localhost:3000/auth/google"
-          className="group flex w-full items-center justify-center gap-3 rounded-xl border border-slate-300/60 bg-white px-4 py-3 font-semibold text-slate-900 transition hover:-translate-y-0.5 hover:bg-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-400"
+          className="group flex w-full items-center justify-center gap-3 rounded-xl border border-slate-300/60 bg-white px-4 py-3 font-semibold text-slate-900 transition hover:-translate-y-0.5 hover:bg-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-400"
         >
           <img
             src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Google_%22G%22_logo.svg/768px-Google_%22G%22_logo.svg.png"
