@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { FaTimes, FaUserSecret } from "react-icons/fa";
 
 export default function CreateQuestionModal({ onClose }) {
   const [title, setTitle] = useState("");
@@ -7,17 +8,15 @@ export default function CreateQuestionModal({ onClose }) {
   const [isAnonymous, setIsAnonymous] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [categories, setCategories] = useState([]); // ✅ Initialized as empty array
-  const [categoriesLoading, setCategoriesLoading] = useState(true); // ✅ Loading state for categories
+  const [categories, setCategories] = useState([]);
+  const [categoriesLoading, setCategoriesLoading] = useState(true);
 
   useEffect(() => {
-    // Fetch categories from API
     const fetchCategories = async () => {
       try {
         const response = await axios.get("http://localhost:3000/api/categories");
-        setCategories(response.data.data); // Adjust based on API response structure
-      } catch (err) {
-        // console.error("Error fetching categories:", err);
+        setCategories(response.data.data || []);
+      } catch (_err) {
         setError("Failed to load categories.");
       } finally {
         setCategoriesLoading(false);
@@ -33,7 +32,6 @@ export default function CreateQuestionModal({ onClose }) {
     setError("");
 
     const token = localStorage.getItem("auth_token");
-
     if (!token) {
       setError("User is not authenticated.");
       setLoading(false);
@@ -43,102 +41,127 @@ export default function CreateQuestionModal({ onClose }) {
     try {
       const requestData = {
         title,
-        category_id: parseInt(categoryId, 10),
+        category_id: parseInt(categoryId, 10)
       };
 
       if (isAnonymous) {
         requestData.is_anonymous = 1;
       }
 
-      // console.log("Request Data:", requestData);
-
-      const response = await axios.post(
-        "http://localhost:3000/api/question",
-        requestData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            Accept: "application/json",
-          },
+      await axios.post("http://localhost:3000/api/question", requestData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          Accept: "application/json"
         }
-      );
-      // console.log("Question Created:", response.data);
+      });
       onClose();
     } catch (err) {
-      // console.error("Error:", err.response?.data || err);
       setError(err.response?.data?.message || "Failed to create question. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
+  const charCount = title.trim().length;
+
   return (
-    <div className="fixed inset-0 flex items-center z-50 justify-center bg-black bg-opacity-50">
-      <div className="bg-gray-800 p-6 rounded-lg shadow-lg w-full max-w-md text-white">
-        <h2 className="text-2xl font-bold mb-4">Submit a new Regret</h2>
-        
-        {/* Show loading message if categories are still loading */}
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
+      <div
+        className="absolute inset-0"
+        onClick={onClose}
+        aria-hidden="true"
+      />
+
+      <div className="relative w-full max-w-md rounded-2xl border border-white/10 bg-slate-950/95 p-5 text-white shadow-[0_24px_60px_rgba(0,0,0,0.55)] sm:p-6">
+        <div className="pointer-events-none absolute left-[-45px] top-[-45px] h-36 w-36 rounded-full bg-red-500/20 blur-3xl" />
+        <div className="pointer-events-none absolute bottom-[-40px] right-[-30px] h-32 w-32 rounded-full bg-cyan-500/10 blur-3xl" />
+
+        <div className="relative mb-3 flex items-center justify-end">
+          <button
+            onClick={onClose}
+            className="rounded-full border border-white/10 bg-white/5 p-2 text-slate-300 transition hover:bg-white/10 hover:text-white"
+            aria-label="Close"
+          >
+            <FaTimes size={14} />
+          </button>
+        </div>
+
         {categoriesLoading ? (
-          <p className="text-green-500">Loading categories...</p>
+          <div className="rounded-xl border border-white/10 bg-slate-900/60 p-4 text-sm text-slate-300">
+            Loading categories...
+          </div>
         ) : (
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Question Title Input */}
-            <input
-              type="text"
-              placeholder="Your Regret here..."
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              className="w-full px-4 py-2 rounded bg-gray-700 focus:outline-none focus:ring-2 focus:ring-green-500"
-              required
-            />
-
-            {/* Category Dropdown */}
-            <select
-              value={categoryId}
-              onChange={(e) => setCategoryId(e.target.value)}
-              className="w-full px-4 py-2 rounded bg-gray-700 focus:outline-none focus:ring-2 focus:ring-green-500"
-              required
-            >
-              <option value="" disabled>
-                Select Category
-              </option>
-              {categories.map((category) => (
-                <option key={category.id} value={category.id}>
-                  {category.name}
-                </option>
-              ))}
-            </select>
-
-            {/* Post Anonymously Checkbox */}
-            <div className="flex items-center space-x-2">
-              <input
-                type="checkbox"
-                id="anonymous"
-                checked={isAnonymous}
-                onChange={(e) => setIsAnonymous(e.target.checked)}
-                className="w-4 h-4"
+          <form onSubmit={handleSubmit} className="relative space-y-4">
+            <div>
+              <label htmlFor="regret-title" className="mb-2 block text-sm font-medium text-slate-200">
+                Regret
+              </label>
+              <textarea
+                id="regret-title"
+                placeholder="Write what happened..."
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                rows={4}
+                maxLength={300}
+                className="w-full rounded-xl border border-white/10 bg-slate-900/70 px-4 py-3 text-base text-white outline-none transition placeholder:text-slate-500 focus:border-red-400/50 focus:ring-2 focus:ring-red-500/25"
+                required
               />
-              <label htmlFor="anonymous" className="text-sm">Submit Anonymously</label>
+              <div className="mt-1 text-right text-xs text-slate-500">{charCount}/300</div>
             </div>
 
-            {/* Error Message */}
-            {error && <p className="text-red-500 text-sm">{error}</p>}
+            <div>
+              <label htmlFor="regret-category" className="mb-2 block text-sm font-medium text-slate-200">
+                Story Type
+              </label>
+              <select
+                id="regret-category"
+                value={categoryId}
+                onChange={(e) => setCategoryId(e.target.value)}
+                className="w-full rounded-xl border border-white/10 bg-slate-900/70 px-4 py-3 text-base text-white outline-none transition focus:border-red-400/50 focus:ring-2 focus:ring-red-500/25"
+                required
+              >
+                <option value="" disabled>
+                  Select Story Type
+                </option>
+                {categories.map((category) => (
+                  <option key={category.id} value={category.id}>
+                    {category.name}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-            {/* Buttons */}
-            <div className="flex justify-end space-x-2">
+            <label className="flex items-center gap-3 rounded-xl border border-white/10 bg-slate-900/60 p-3 text-sm text-slate-300">
+              <input
+                type="checkbox"
+                checked={isAnonymous}
+                onChange={(e) => setIsAnonymous(e.target.checked)}
+                className="h-4 w-4 accent-red-500"
+              />
+              <FaUserSecret size={14} className="text-slate-400" />
+              Post as anonymous
+            </label>
+
+            {error && (
+              <div className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
+                {error}
+              </div>
+            )}
+
+            <div className="flex items-center justify-end gap-3 pt-2">
               <button
                 type="button"
-                className="bg-gray-600 hover:bg-gray-700 text-white py-2 px-4 rounded"
+                className="inline-flex h-11 items-center justify-center rounded-full border border-white/20 bg-white/5 px-6 text-sm font-medium tracking-wide text-slate-100 transition hover:border-white/30 hover:bg-white/10"
                 onClick={onClose}
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded font-bold transition duration-300"
+                className="inline-flex h-11 min-w-[138px] items-center justify-center rounded-full bg-gradient-to-r from-red-500 via-rose-500 to-orange-400 px-6 text-sm font-semibold tracking-wide text-white shadow-[0_10px_24px_rgba(239,68,68,0.35)] transition hover:from-red-600 hover:via-rose-600 hover:to-orange-500 disabled:cursor-not-allowed disabled:opacity-60"
                 disabled={loading}
               >
-                {loading ? "Submitting..." : "Create"}
+                {loading ? "Submitting..." : "Post Regret"}
               </button>
             </div>
           </form>

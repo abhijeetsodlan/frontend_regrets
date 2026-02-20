@@ -58,7 +58,7 @@ export default function GetStarted() {
           <span className="block">Feel it.</span>
         </h1>
         <p className="text-lg sm:text-xl text-gray-300 font-light">
-          A safe, anonymous space to share regrets. Discover what others hold inside—and maybe, feel a little less alone.
+          A safe, anonymous space to share regrets. Discover what others hold inside and maybe, feel a little less alone.
         </p>
         <Link to="/regrets">
           <button className="mt-6 px-8 py-3 bg-red-500 hover:bg-red-600 text-white text-lg rounded-full shadow-md transition duration-300 ease-in-out hover:shadow-red-600/30">

@@ -16,7 +16,7 @@ const Footer = () => {
               Regrets.in
             </h2>
             <p className="text-sm text-gray-600 max-w-xs">
-              Share your regrets, read others’ stories, and connect—anonymously
+              Share your regrets, read others’ stories, and connect anonymously
               or openly.
             </p>
           </div>
@@ -79,27 +79,6 @@ const Footer = () => {
                 </span>
               </p>
             </a>
-          </div>
-          <div className="flex items-start mt-4">
-            <img
-              src="https://pbs.twimg.com/profile_images/1914539916601577472/sufuUWSe_400x400.jpg"
-              alt="Piyush Kumar"
-              className="w-10 h-10 rounded-full border-2 border-red-400 object-cover shadow-sm"
-            />
-            <div className="ml-3 text-sm text-gray-700">
-              <p>
-                <span className="font-semibold text-gray-900">
-                  Piyush Kumar
-                </span>
-              </p>
-              <ul className="text-xs text-gray-500 list-disc list-inside leading-snug mt-1">
-                <li>SEO Manager</li>
-                <li>Chief Strategy Officer</li>
-                <li>Head of Product & Growth</li>
-                <li>Marketing Director</li>
-                <li>Behavioral Data Analyst</li>
-              </ul>
-            </div>
           </div>
         </div>
 

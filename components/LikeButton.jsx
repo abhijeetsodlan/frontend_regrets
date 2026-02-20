@@ -2,19 +2,23 @@ import React from "react";
 import { FaHeart, FaRegHeart } from "react-icons/fa";
 
 const LikeButton = ({ questionId, likes, handleLike }) => {
+  const liked = Boolean(likes[questionId]?.liked);
+  const count = likes[questionId]?.count || 0;
+
   return (
     <button
       onClick={(e) => handleLike(e, questionId)}
-      className="flex items-center px-3 py-2 text-white rounded-md hover:bg-gray-700 transition"
+      className={`inline-flex h-10 items-center gap-2 rounded-full border px-3 text-sm font-medium transition ${
+        liked
+          ? "border-red-400/40 bg-red-500/15 text-red-300"
+          : "border-white/10 bg-slate-900/55 text-slate-300 hover:border-white/20 hover:bg-slate-800 hover:text-white"
+      }`}
     >
-      {likes[questionId]?.liked ? (
-        <FaHeart size={16} className="mr-1 text-red-500" />
-      ) : (
-        <FaRegHeart size={16} className="mr-1" />
-      )}
-      <span className="text-sm">{likes[questionId]?.count || 0}</span>
+      {liked ? <FaHeart size={14} className="text-red-400" /> : <FaRegHeart size={14} />}
+      <span>{count}</span>
     </button>
   );
 };
 
 export default LikeButton;
+

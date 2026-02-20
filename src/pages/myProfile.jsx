@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
+import { FaArrowLeft, FaRegBookmark, FaRegFileAlt, FaAt } from "react-icons/fa";
 
 const UserProfile = () => {
   const [activeTab, setActiveTab] = useState("uploaded");
@@ -21,17 +22,14 @@ const UserProfile = () => {
           throw new Error("User not authenticated");
         }
 
-        const response = await fetch(
-          "http://localhost:3000/api/myprofile",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${authToken}`,
-            },
-            body: JSON.stringify({ email: userEmail }),
-          }
-        );
+        const response = await fetch("http://localhost:3000/api/myprofile", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${authToken}`
+          },
+          body: JSON.stringify({ email: userEmail })
+        });
 
         if (!response.ok) {
           throw new Error("Failed to fetch profile data");
@@ -40,13 +38,13 @@ const UserProfile = () => {
         const data = await response.json();
         setUser({
           name: data.data.name || "",
-          email: data.data.email || "",
+          email: data.data.email || ""
         });
         setUploadedPosts(data.data.uploaded_posts || []);
         setSavedPosts(data.data.saved_posts || []);
-        setLoading(false);
       } catch (err) {
-        setError(err.message);
+        setError(err.message || "Something went wrong");
+      } finally {
         setLoading(false);
       }
     };
@@ -54,89 +52,123 @@ const UserProfile = () => {
     fetchProfileData();
   }, []);
 
-  const nameInitial = user.name.charAt(0).toUpperCase();
+  const nameInitial = useMemo(() => {
+    const value = user.name?.trim();
+    return value ? value.charAt(0).toUpperCase() : "U";
+  }, [user.name]);
+
+  const currentPosts = activeTab === "uploaded" ? uploadedPosts : savedPosts;
   const handleRegretClick = (postId) => navigate(`/regrets/${postId}`);
   const handleBackClick = () => navigate(-1);
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-950 text-white flex items-center justify-center">
-        <p>Loading...</p>
+      <div className="min-h-screen bg-gradient-to-b from-slate-950 via-[#090b12] to-slate-950 px-4 py-8 text-white">
+        <div className="mx-auto max-w-3xl space-y-4">
+          <div className="h-28 rounded-2xl border border-white/10 bg-slate-900/55" />
+          <div className="h-12 rounded-2xl border border-white/10 bg-slate-900/55" />
+          <div className="h-20 rounded-xl border border-white/10 bg-slate-900/55" />
+          <div className="h-20 rounded-xl border border-white/10 bg-slate-900/55" />
+        </div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-950 text-white flex items-center justify-center">
-        <p className="text-red-400">Error: {error}</p>
+      <div className="min-h-screen bg-gradient-to-b from-slate-950 via-[#090b12] to-slate-950 px-4 py-8 text-white">
+        <div className="mx-auto max-w-3xl rounded-2xl border border-red-500/30 bg-red-500/10 p-6 text-center text-red-300">
+          Error: {error}
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white px-4 py-8 flex flex-col items-center">
-      {/* Profile Card */}
-      <div className="w-full max-w-2xl bg-gray-800 p-6 rounded-2xl shadow-xl flex flex-col sm:flex-row items-center justify-between gap-4">
-        <div className="flex items-center space-x-4">
-          <div className="w-16 h-16 rounded-full bg-gray-700 text-red-400 flex items-center justify-center text-2xl font-bold border-4 border-red-500 shadow-inner">
-            {nameInitial}
-          </div>
-          <div>
-            <h2 className="text-xl font-semibold text-red-400">{user.name}</h2>
-            <p className="text-sm text-gray-400">{user.email}</p>
-          </div>
-        </div>
+    <div className="min-h-screen bg-gradient-to-b from-slate-950 via-[#090b12] to-slate-950 px-4 py-8 text-white sm:py-10">
+      <div className="mx-auto w-full max-w-3xl">
         <button
           onClick={handleBackClick}
-          className="flex items-center space-x-2 text-sm text-red-400 hover:text-red-300 transition"
+          className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/10 bg-slate-900/60 px-4 py-2 text-sm text-slate-300 transition hover:border-white/20 hover:bg-slate-800 hover:text-white"
         >
-          <span className="text-lg">←</span>
-          <span>Back</span>
+          <FaArrowLeft size={12} />
+          Back
         </button>
-      </div>
 
-      {/* Tabs */}
-      <div className="w-full max-w-2xl mt-8">
-        <div className="flex border-b border-gray-700">
-          {["uploaded", "saved"].map((tab) => (
+        <section className="relative overflow-hidden rounded-2xl border border-white/10 bg-slate-900/70 p-5 shadow-[0_18px_45px_rgba(0,0,0,0.35)] backdrop-blur sm:p-6">
+          <div className="pointer-events-none absolute -right-16 -top-16 h-44 w-44 rounded-full bg-red-500/15 blur-3xl" />
+          <div className="pointer-events-none absolute -left-16 -bottom-16 h-40 w-40 rounded-full bg-cyan-500/10 blur-3xl" />
+
+          <div className="relative flex flex-col items-start justify-between gap-5 sm:flex-row sm:items-center">
+            <div className="flex items-center gap-4">
+              <div className="relative flex h-16 w-16 items-center justify-center rounded-full border border-red-300/40 bg-gradient-to-br from-red-500/25 to-rose-500/10 text-2xl font-bold text-red-200 shadow-[0_8px_25px_rgba(239,68,68,0.3)]">
+                <span className="absolute inset-0 rounded-full border border-white/10" />
+                {nameInitial}
+              </div>
+              <div className="space-y-1">
+                <h2 className="text-2xl font-semibold text-slate-100">{user.name || "Anonymous User"}</h2>
+                <p className="inline-flex items-center gap-2 text-sm text-slate-400">
+                  <FaAt size={11} />
+                  {user.email || "No email available"}
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="mt-5 rounded-2xl border border-white/10 bg-slate-900/60 p-3 shadow-[0_14px_35px_rgba(0,0,0,0.28)]">
+          <div className="flex items-center justify-between gap-3 rounded-xl bg-slate-950/45 p-1">
             <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              className={`flex-1 py-2 text-center font-medium transition-all ${
-                activeTab === tab
-                  ? "text-red-400 border-b-2 border-red-400"
-                  : "text-gray-400 hover:text-red-400"
+              onClick={() => setActiveTab("uploaded")}
+              className={`inline-flex h-11 flex-1 items-center justify-center gap-2 rounded-lg text-sm font-medium transition ${
+                activeTab === "uploaded"
+                  ? "bg-gradient-to-r from-red-500/30 to-rose-500/20 text-red-100 shadow-[0_8px_20px_rgba(239,68,68,0.25)]"
+                  : "text-slate-300 hover:bg-white/5 hover:text-white"
               }`}
             >
-              {tab === "uploaded" ? "Your Regrets" : "Saved Regrets"}
+              <FaRegFileAlt size={13} />
+              Your Regrets
             </button>
-          ))}
-        </div>
+            <button
+              onClick={() => setActiveTab("saved")}
+              className={`inline-flex h-11 flex-1 items-center justify-center gap-2 rounded-lg text-sm font-medium transition ${
+                activeTab === "saved"
+                  ? "bg-gradient-to-r from-red-500/30 to-rose-500/20 text-red-100 shadow-[0_8px_20px_rgba(239,68,68,0.25)]"
+                  : "text-slate-300 hover:bg-white/5 hover:text-white"
+              }`}
+            >
+              <FaRegBookmark size={13} />
+              Saved
+            </button>
+          </div>
+        </section>
 
-        {/* Regret Posts */}
-        <div className="mt-6 space-y-4">
-          {(activeTab === "uploaded" ? uploadedPosts : savedPosts).length > 0 ? (
-            (activeTab === "uploaded" ? uploadedPosts : savedPosts).map((post) => (
-              <div
+        <section className="mt-5 space-y-3">
+          {currentPosts.length > 0 ? (
+            currentPosts.map((post) => (
+              <article
                 key={post.id}
                 onClick={() => handleRegretClick(post.id)}
-                className="bg-gray-800 hover:bg-gray-700 transition-all p-4 rounded-lg shadow flex justify-between items-center cursor-pointer group"
+                className="group cursor-pointer rounded-xl border border-white/10 bg-slate-900/60 p-4 shadow-[0_14px_35px_rgba(0,0,0,0.28)] transition-all duration-300 hover:-translate-y-0.5 hover:border-red-400/30 hover:bg-slate-900/80"
               >
-                <p className="text-sm text-gray-300">{post.title}</p>
-                <span className="text-xl font-bold text-gray-500 group-hover:text-white transition">
-                  →
-                </span>
-              </div>
+                <div className="flex items-center justify-between gap-4">
+                  <p className="line-clamp-2 text-sm leading-6 text-slate-200 sm:text-base">
+                    {post.title}
+                  </p>
+                  <span className="rounded-full border border-white/10 bg-slate-950/60 px-3 py-1 text-xs text-slate-400 transition group-hover:border-red-300/35 group-hover:text-slate-200">
+                    Open
+                  </span>
+                </div>
+              </article>
             ))
           ) : (
-            <p className="text-center text-gray-400">
+            <div className="rounded-xl border border-white/10 bg-slate-900/50 p-6 text-center text-sm text-slate-400">
               {activeTab === "uploaded"
-                ? "No uploaded posts yet."
-                : "No saved posts yet."}
-            </p>
+                ? "No regrets posted yet."
+                : "No saved regrets yet."}
+            </div>
           )}
-        </div>
+        </section>
       </div>
     </div>
   );

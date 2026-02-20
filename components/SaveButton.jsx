@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { FaRegBookmark } from "react-icons/fa";
+import { FaBookmark, FaRegBookmark } from "react-icons/fa";
 import axios from "axios";
 
 const API_BASE_URL = "http://localhost:3000/api";
@@ -14,14 +14,13 @@ const SaveButton = ({ questionId }) => {
   const handleSave = async (e) => {
     e.preventDefault();
     e.stopPropagation();
-
     if (loading) return;
 
     setLoading(true);
     try {
       const config = {
         headers: { Authorization: `Bearer ${token}` },
-        params: { email: storedEmail },
+        params: { email: storedEmail }
       };
 
       const response = await axios.post(
@@ -29,12 +28,11 @@ const SaveButton = ({ questionId }) => {
         { question_id: questionId },
         config
       );
-
       if (response.status === 200 || response.status === 201) {
-        setIsSaved(true);
+        setIsSaved((prev) => !prev);
       }
-    } catch (error) {
-      // console.error("Error saving post:", error);
+    } catch (_error) {
+      // Silent fail to avoid interrupting reading flow.
     } finally {
       setLoading(false);
     }
@@ -43,14 +41,18 @@ const SaveButton = ({ questionId }) => {
   return (
     <button
       onClick={handleSave}
-      disabled={loading || isSaved}
-      className={`text-white rounded-md px-2 py-1 transition flex items-center justify-center ${
-        isSaved ? "text-blue-400" : "hover:text-blue-500"
-      } ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
+      disabled={loading}
+      className={`inline-flex h-10 items-center gap-2 rounded-full border px-3 text-sm font-medium transition ${
+        isSaved
+          ? "border-blue-400/40 bg-blue-500/15 text-blue-300"
+          : "border-white/10 bg-slate-900/55 text-slate-300 hover:border-white/20 hover:bg-slate-800 hover:text-white"
+      } ${loading ? "cursor-not-allowed opacity-60" : ""}`}
     >
-      <FaRegBookmark className="text-lg" />
+      {isSaved ? <FaBookmark size={14} /> : <FaRegBookmark size={14} />}
+      <span>{isSaved ? "Saved" : "Save"}</span>
     </button>
   );
 };
 
 export default SaveButton;
+

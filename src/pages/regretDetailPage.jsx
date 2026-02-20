@@ -1,12 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
-import {
-  FaRegHeart,
-  FaHeart,
-  FaArrowLeft,
-  FaPaperPlane,
-} from "react-icons/fa";
+import { FaRegHeart, FaHeart, FaArrowLeft, FaPaperPlane, FaUserSecret } from "react-icons/fa";
 import SharePopup from "../../components/SharePopUp";
 
 const API_BASE_URL = "http://localhost:3000/api";
@@ -19,53 +14,45 @@ const RegretDetailPage = () => {
   const [replyText, setReplyText] = useState("");
   const [isAnonymousReply, setIsAnonymousReply] = useState(true);
   const [comments, setComments] = useState([]);
+  const [submittingReply, setSubmittingReply] = useState(false);
 
   const navigate = useNavigate();
   const token = localStorage.getItem("auth_token");
   const storedEmail = localStorage.getItem("useremail");
 
   const getAuthHeader = () => ({
-    headers: { Authorization: `Bearer ${token}` },
+    headers: { Authorization: `Bearer ${token}` }
   });
 
   const getAuthHeaderWithEmail = () => ({
     headers: { Authorization: `Bearer ${token}` },
-    params: { email: storedEmail },
+    params: { email: storedEmail }
   });
+
+  const sortCommentsNewestFirst = (items = []) =>
+    [...items].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+  const loadData = async () => {
+    try {
+      const [questionRes, commentsRes] = await Promise.all([
+        axios.get(`${API_BASE_URL}/questions/${regret_id}`, getAuthHeaderWithEmail()),
+        axios.get(`${API_BASE_URL}/comments/${regret_id}`, getAuthHeaderWithEmail())
+      ]);
+
+      setRegret(questionRes.data.question || null);
+      setComments(sortCommentsNewestFirst(commentsRes.data.comments || []));
+      setError(null);
+    } catch (_err) {
+      setError("Failed to load regret details.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     window.scrollTo(0, 0);
-  }, []);
-
-  useEffect(() => {
-    const fetchRegret = async () => {
-      try {
-        const response = await axios.get(
-          `${API_BASE_URL}/questions/${regret_id}`,
-          getAuthHeaderWithEmail()
-        );
-        setRegret(response.data.question);
-        setLoading(false);
-      } catch (err) {
-        setError("Failed to load regret details.");
-        setLoading(false);
-      }
-    };
-
-    const fetchComments = async () => {
-      try {
-        const response = await axios.get(
-          `${API_BASE_URL}/comments/${regret_id}`,
-          getAuthHeaderWithEmail()
-        );
-        setComments(response.data.comments);
-      } catch (error) {
-        console.error("Error fetching comments:", error);
-      }
-    };
-
-    fetchRegret();
-    fetchComments();
+    loadData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [regret_id]);
 
   const handleLike = async (e) => {
@@ -73,181 +60,214 @@ const RegretDetailPage = () => {
     if (!regret) return;
 
     const newLikedStatus = !regret.liked_by_user;
-    setRegret({
-      ...regret,
+    setRegret((prev) => ({
+      ...prev,
       liked_by_user: newLikedStatus,
-      likes_count: newLikedStatus
-        ? regret.likes_count + 1
-        : regret.likes_count - 1,
-    });
+      likes_count: newLikedStatus ? prev.likes_count + 1 : prev.likes_count - 1
+    }));
 
     try {
-      await axios.post(
-        `${API_BASE_URL}/questions/${regret_id}/like`,
-        {},
-        getAuthHeader()
-      );
-    } catch (error) {
-      console.error("Error liking question:", error);
+      await axios.post(`${API_BASE_URL}/questions/${regret_id}/like`, {}, getAuthHeader());
+    } catch (_error) {
+      setRegret((prev) => ({
+        ...prev,
+        liked_by_user: !newLikedStatus,
+        likes_count: !newLikedStatus ? prev.likes_count + 1 : prev.likes_count - 1
+      }));
     }
   };
 
   const handleReplySubmit = async (e) => {
     e.preventDefault();
-    if (!replyText.trim()) return;
+    if (!replyText.trim() || submittingReply) return;
 
+    setSubmittingReply(true);
     try {
       await axios.post(
         `${API_BASE_URL}/comment`,
         {
-          title: replyText,
+          title: replyText.trim(),
           question_id: regret_id,
           is_anonymous: isAnonymousReply ? 1 : 0,
-          email: storedEmail,
+          email: storedEmail
         },
         getAuthHeader()
       );
+
       setReplyText("");
-      const res = await axios.get(
-        `${API_BASE_URL}/comments/${regret_id}`,
-        getAuthHeaderWithEmail()
-      );
-      setComments(res.data.comments);
-    } catch (error) {
-      if (error.response) {
-        console.error("Server Error:", error.response.data);
-        // alert("Server Error: " + JSON.stringify(error.response.data));
-      } else if (error.request) {
-        console.error("No response:", error.request);
-        // alert("No response from server. Please check your network.");
-      } else {
-        console.error("Error:", error.message);
-        // alert("Error: " + error.message);
-      }
+      const res = await axios.get(`${API_BASE_URL}/comments/${regret_id}`, getAuthHeaderWithEmail());
+      setComments(sortCommentsNewestFirst(res.data.comments || []));
+    } catch (_error) {
+      // keep quiet to avoid interrupting flow
+    } finally {
+      setSubmittingReply(false);
     }
   };
 
-  if (loading) return <p className="text-center text-white py-4">Loading...</p>;
-  if (error) return <p className="text-center text-red-400 py-4">{error}</p>;
-  if (!regret)
-    return <p className="text-center text-gray-400 py-4">Regret not found.</p>;
+  const formatDate = (value) =>
+    new Date(value).toLocaleDateString("en-GB", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric"
+    });
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-slate-950 via-[#090b12] to-slate-950 px-4 py-10 text-white">
+        <div className="mx-auto max-w-3xl rounded-2xl border border-white/10 bg-slate-900/50 p-6 text-center text-slate-300">
+          Loading regret...
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-slate-950 via-[#090b12] to-slate-950 px-4 py-10 text-white">
+        <div className="mx-auto max-w-3xl rounded-2xl border border-red-500/30 bg-red-500/10 p-6 text-center text-red-300">
+          {error}
+        </div>
+      </div>
+    );
+  }
+
+  if (!regret) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-slate-950 via-[#090b12] to-slate-950 px-4 py-10 text-white">
+        <div className="mx-auto max-w-3xl rounded-2xl border border-white/10 bg-slate-900/50 p-6 text-center text-slate-400">
+          Regret not found.
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white py-10 px-4">
-      <div className="w-full max-w-2xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-b from-slate-950 via-[#090b12] to-slate-950 px-4 py-8 text-white sm:py-10">
+      <div className="mx-auto w-full max-w-3xl">
         <button
           onClick={() => navigate(-1)}
-          className="text-gray-400 hover:text-white transition mb-6 flex items-center"
+          className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/10 bg-slate-900/60 px-4 py-2 text-sm text-slate-300 transition hover:border-white/20 hover:bg-slate-800 hover:text-white"
         >
-          <FaArrowLeft className="mr-2" />
+          <FaArrowLeft size={12} />
           Back
         </button>
 
-        <div className="bg-gray-900 border border-gray-800 rounded-2xl shadow-xl p-6">
-          {/* Header */}
-          <div className="flex items-center mb-5">
-            <div
-              className={`w-12 h-12 flex items-center justify-center rounded-full font-bold text-lg mr-4 shadow-sm
-                ${
-                  regret.is_anonymous
-                    ? "bg-gray-700 text-white"
-                    : "bg-red-500 text-white"
-                }`}
-            >
-              {regret.is_anonymous ? "🕶️" : regret.user.name.charAt(0)}
-            </div>
-            <div>
-              <p className="font-semibold text-base sm:text-lg text-gray-100">
-                {regret.is_anonymous ? "Anonymous" : regret.user.name}
+        <article className="rounded-2xl border border-white/10 bg-slate-900/65 p-5 shadow-[0_18px_45px_rgba(0,0,0,0.35)] backdrop-blur sm:p-6">
+          <div className="mb-5 flex items-center">
+            {regret.is_anonymous ? (
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-slate-700 text-slate-200">
+                <FaUserSecret size={18} />
+              </div>
+            ) : (
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-red-500 text-base font-bold text-white">
+                {regret.user?.name?.charAt(0) || "U"}
+              </div>
+            )}
+
+            <div className="ml-3">
+              <p className="text-lg font-semibold text-slate-100">
+                {regret.is_anonymous ? "Anonymous" : regret.user?.name || "Unknown"}
               </p>
-              <p className="text-xs text-gray-400">
-                {new Date(regret.created_at).toLocaleDateString("en-GB", {
-                  day: "2-digit",
-                  month: "short",
-                  year: "numeric",
-                })}
+              <p className="mt-1 text-xs uppercase tracking-wide text-slate-400">
+                {formatDate(regret.created_at)}
               </p>
             </div>
           </div>
 
-          {/* Title */}
-          <p className="text-lg sm:text-xl font-normal text-gray-100 mb-6 leading-relaxed">
-            {regret.title}
-          </p>
+          <p className="mb-6 text-xl leading-relaxed text-slate-100 sm:text-2xl">{regret.title}</p>
 
-          {/* Like & Share */}
-          <div className="flex items-center space-x-5 mb-6">
+          <div className="mb-6 flex flex-wrap items-center gap-2 border-t border-white/10 pt-4 sm:gap-3">
             <button
               onClick={handleLike}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-800 hover:bg-red-500 hover:text-white text-white transition shadow-sm border border-gray-700"
+              className={`inline-flex h-10 items-center gap-2 rounded-full border px-3 text-sm font-medium transition ${
+                regret.liked_by_user
+                  ? "border-red-400/40 bg-red-500/15 text-red-300"
+                  : "border-white/10 bg-slate-900/55 text-slate-300 hover:border-white/20 hover:bg-slate-800 hover:text-white"
+              }`}
             >
-              {regret.liked_by_user ? (
-                <FaHeart className="text-red-500" />
-              ) : (
-                <FaRegHeart />
-              )}
-              {regret.likes_count}
+              {regret.liked_by_user ? <FaHeart size={14} className="text-red-400" /> : <FaRegHeart size={14} />}
+              <span>{regret.likes_count || 0}</span>
             </button>
+
             <SharePopup regretId={regret.id} regretTitle={regret.title} />
           </div>
 
-          {/* Comment Input */}
-          <form onSubmit={handleReplySubmit} className="relative mb-4">
-            <input
-              type="text"
-              value={replyText}
-              onChange={(e) => setReplyText(e.target.value)}
-              placeholder="Write a thoughtful reply..."
-              className="w-full p-3 pr-12 rounded-xl bg-gray-800 text-sm border border-gray-700 focus:outline-none focus:ring-2 focus:ring-red-500 transition"
-            />
-            <button
-              type="submit"
-              className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-red-500 transition"
-            >
-              <FaPaperPlane size={16} />
-            </button>
-          </form>
+          <div className="rounded-2xl border border-white/10 bg-slate-950/60 p-4">
+            <form onSubmit={handleReplySubmit} className="space-y-3">
+              <textarea
+                value={replyText}
+                onChange={(e) => setReplyText(e.target.value)}
+                placeholder="Write a thoughtful reply..."
+                rows={3}
+                maxLength={280}
+                className="w-full resize-none rounded-xl border border-white/10 bg-slate-900/70 px-4 py-3 text-sm text-white outline-none transition placeholder:text-slate-500 focus:border-red-400/50 focus:ring-2 focus:ring-red-500/25"
+              />
 
-          {/* Anonymous checkbox */}
-          <div className="flex items-center text-sm text-gray-300 mb-6">
-            <input
-              type="checkbox"
-              id="anonymousReply"
-              checked={isAnonymousReply}
-              onChange={() => setIsAnonymousReply(!isAnonymousReply)}
-              className="mr-2 accent-red-500"
-            />
-            <label htmlFor="anonymousReply">Post Anonymously</label>
-          </div>
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <label className="inline-flex items-center gap-2 text-sm text-slate-300">
+                  <input
+                    type="checkbox"
+                    checked={isAnonymousReply}
+                    onChange={() => setIsAnonymousReply(!isAnonymousReply)}
+                    className="h-4 w-4 accent-red-500"
+                  />
+                  Post anonymously
+                </label>
 
-          {/* Comments */}
-          <div className="mt-6 space-y-4">
-            {comments.length === 0 ? (
-              <p className="text-gray-500 italic">No replies yet.</p>
-            ) : (
-              comments.map((comment) => (
-                <div
-                  key={comment.id}
-                  className="bg-gray-800 border border-gray-700 p-4 rounded-xl shadow-sm"
+                <button
+                  type="submit"
+                  disabled={submittingReply || !replyText.trim()}
+                  className="inline-flex h-10 items-center gap-2 rounded-full bg-gradient-to-r from-red-500 to-red-400 px-5 text-sm font-semibold text-white shadow-[0_10px_24px_rgba(239,68,68,0.35)] transition hover:from-red-600 hover:to-red-500 disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                  <div className="flex items-center mb-2">
-                    <div className="w-8 h-8 rounded-full bg-gray-700 text-white flex items-center justify-center text-sm font-semibold mr-2">
-                      {comment.is_anonymous
-                        ? "🕶️"
-                        : comment.user?.name?.charAt(0)}
-                    </div>
-                    <span className="text-sm font-medium text-gray-100">
-                      {comment.is_anonymous
-                        ? "Anonymous"
-                        : comment.user?.name}
-                    </span>
-                  </div>
-                  <p className="text-sm text-gray-300">{comment.title}</p>
-                </div>
-              ))
-            )}
+                  <FaPaperPlane size={12} />
+                  {submittingReply ? "Posting..." : "Post Reply"}
+                </button>
+              </div>
+            </form>
           </div>
-        </div>
+        </article>
+
+        <section className="mt-6 rounded-2xl border border-white/10 bg-slate-900/55 p-5 shadow-[0_14px_35px_rgba(0,0,0,0.28)]">
+          <div className="mb-4 flex items-center justify-between">
+            <h3 className="text-lg font-semibold text-slate-100">Replies</h3>
+            <span className="rounded-full border border-white/10 bg-slate-900/65 px-3 py-1 text-xs text-slate-300">
+              {comments.length}
+            </span>
+          </div>
+
+          {comments.length === 0 ? (
+            <p className="rounded-xl border border-white/10 bg-slate-950/55 p-4 text-sm text-slate-400">
+              No replies yet. Be the first to respond.
+            </p>
+          ) : (
+            <div className="space-y-3">
+              {comments.map((comment) => (
+                <article
+                  key={comment.id}
+                  className="rounded-xl border border-white/10 bg-slate-950/55 p-4"
+                >
+                  <div className="mb-2 flex items-center">
+                    {comment.is_anonymous ? (
+                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-700 text-slate-200">
+                        <FaUserSecret size={12} />
+                      </div>
+                    ) : (
+                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white">
+                        {comment.user?.name?.charAt(0) || "U"}
+                      </div>
+                    )}
+                    <div className="ml-2">
+                      <p className="text-sm font-medium text-slate-100">
+                        {comment.is_anonymous ? "Anonymous" : comment.user?.name || "Unknown"}
+                      </p>
+                    </div>
+                  </div>
+                  <p className="text-sm leading-7 text-slate-300">{comment.title}</p>
+                </article>
+              ))}
+            </div>
+          )}
+        </section>
       </div>
     </div>
   );

@@ -1,23 +1,32 @@
 import React, { useState, useEffect } from "react";
-import { FaWhatsapp, FaInstagram, FaTwitter, FaLink, FaTimes, FaShareAlt } from "react-icons/fa";
+import {
+  FaWhatsapp,
+  FaInstagram,
+  FaTwitter,
+  FaLink,
+  FaTimes,
+  FaShareAlt
+} from "react-icons/fa";
 
 const SharePopup = ({ regretId, regretTitle }) => {
   const [isOpen, setIsOpen] = useState(false);
 
-  const shareUrl = `https://regrets.in/regrets/${regretId}`;
+  const shareUrl = `${window.location.origin}/regrets/${regretId}`;
   const shareText = `Check out this regret: "${regretTitle}" on Regrets.in`;
 
   const togglePopup = (e) => {
     e.stopPropagation();
-    setIsOpen(!isOpen);
+    setIsOpen((prev) => !prev);
   };
 
-  const copyToClipboard = (e) => {
+  const copyToClipboard = async (e) => {
     e.stopPropagation();
-    navigator.clipboard.writeText(shareUrl).then(() => {
-      alert("Link copied to clipboard!");
+    try {
+      await navigator.clipboard.writeText(shareUrl);
       setIsOpen(false);
-    });
+    } catch (_err) {
+      // Ignore clipboard errors silently.
+    }
   };
 
   const shareViaNavigator = async (e) => {
@@ -25,25 +34,18 @@ const SharePopup = ({ regretId, regretTitle }) => {
     if (navigator.share) {
       try {
         await navigator.share({ title: regretTitle, text: shareText, url: shareUrl });
-        setIsOpen(false);
-      } catch (error) {
-        // console.error("Error sharing:", error);
+      } catch (_error) {
+        // no-op
       }
-    } else {
-      togglePopup(e);
+      return;
     }
+    setIsOpen((prev) => !prev);
   };
 
   const shareToWhatsApp = (e) => {
     e.stopPropagation();
     window.open(`https://wa.me/?text=${encodeURIComponent(`${shareText} ${shareUrl}`)}`, "_blank");
     setIsOpen(false);
-  };
-
-  const shareToInstagram = (e) => {
-    e.stopPropagation();
-    copyToClipboard(e);
-    alert("Link copied! Paste it into Instagram to share.");
   };
 
   const shareToTwitter = (e) => {
@@ -53,6 +55,11 @@ const SharePopup = ({ regretId, regretTitle }) => {
       "_blank"
     );
     setIsOpen(false);
+  };
+
+  const shareToInstagram = (e) => {
+    e.stopPropagation();
+    copyToClipboard(e);
   };
 
   useEffect(() => {
@@ -65,39 +72,55 @@ const SharePopup = ({ regretId, regretTitle }) => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [isOpen]);
 
+  const baseButtonClass =
+    "inline-flex h-10 items-center gap-2 rounded-full border border-white/10 bg-slate-900/55 px-3 text-sm font-medium text-slate-300 transition hover:border-white/20 hover:bg-slate-800 hover:text-white";
+
   return (
     <div className="relative">
-      <button
-        onClick={navigator.share ? shareViaNavigator : togglePopup}
-        className="flex items-center px-3 py-2 rounded-md hover:bg-gray-600 text-white transition"
-      >
-        <FaShareAlt size={16} />
+      <button onClick={navigator.share ? shareViaNavigator : togglePopup} className={baseButtonClass}>
+        <FaShareAlt size={14} />
+        <span>Share</span>
       </button>
 
       {isOpen && (
-        <div className="fixed inset-0 flex items-center justify-center z-50" onClick={(e) => e.stopPropagation()}>
-          <div className="absolute inset-0 bg-black bg-opacity-50"></div>
-
-          <div className="share-popup relative bg-white dark:bg-gray-900 rounded-xl p-6 w-80 max-w-sm shadow-2xl z-10">
+        <div className="fixed inset-0 z-50 flex items-center justify-center" onClick={(e) => e.stopPropagation()}>
+          <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
+          <div className="share-popup relative z-10 w-[92%] max-w-sm rounded-2xl border border-white/10 bg-slate-950/95 p-5 shadow-2xl">
             <button
               onClick={togglePopup}
-              className="absolute top-3 right-3 text-gray-500 hover:text-white transition"
+              className="absolute right-3 top-3 rounded-full p-2 text-slate-400 transition hover:bg-white/10 hover:text-white"
             >
-              <FaTimes size={18} />
+              <FaTimes size={14} />
             </button>
-            <h3 className="text-lg font-semibold text-gray-200 mb-5">Share this Regret</h3>
-            <div className="flex flex-col gap-3">
-              <button onClick={shareToWhatsApp} className="btn-share bg-green-600 hover:bg-green-700">
-                <FaWhatsapp className="mr-3" /> WhatsApp
+            <h3 className="mb-4 text-lg font-semibold text-slate-100">Share this regret</h3>
+            <div className="grid gap-2">
+              <button
+                onClick={shareToWhatsApp}
+                className="inline-flex items-center gap-2 rounded-xl bg-green-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-green-500"
+              >
+                <FaWhatsapp size={14} />
+                WhatsApp
               </button>
-              <button onClick={shareToInstagram} className="btn-share bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700">
-                <FaInstagram className="mr-3" /> Instagram
+              <button
+                onClick={shareToInstagram}
+                className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-pink-500 to-violet-500 px-4 py-2 text-sm font-medium text-white transition hover:opacity-90"
+              >
+                <FaInstagram size={14} />
+                Instagram
               </button>
-              <button onClick={shareToTwitter} className="btn-share bg-blue-500 hover:bg-blue-600">
-                <FaTwitter className="mr-3" /> Twitter (X)
+              <button
+                onClick={shareToTwitter}
+                className="inline-flex items-center gap-2 rounded-xl bg-sky-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-sky-500"
+              >
+                <FaTwitter size={14} />
+                Twitter (X)
               </button>
-              <button onClick={copyToClipboard} className="btn-share bg-gray-600 hover:bg-gray-700">
-                <FaLink className="mr-3" /> Copy Link
+              <button
+                onClick={copyToClipboard}
+                className="inline-flex items-center gap-2 rounded-xl bg-slate-700 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-600"
+              >
+                <FaLink size={14} />
+                Copy Link
               </button>
             </div>
           </div>
@@ -108,3 +131,4 @@ const SharePopup = ({ regretId, regretTitle }) => {
 };
 
 export default SharePopup;
+
