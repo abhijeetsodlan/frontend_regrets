@@ -8,6 +8,7 @@ import {
   FaRegCommentDots,
   FaBell,
   FaInbox,
+  FaTags,
   FaBars,
   FaTimes
 } from "react-icons/fa";
@@ -37,6 +38,7 @@ const AdminPanel = () => {
   const [userStats, setUserStats] = useState({ total_users: 0, joined_today: 0 });
   const [questions, setQuestions] = useState([]);
   const [feedbacks, setFeedbacks] = useState([]);
+  const [storyTypes, setStoryTypes] = useState([]);
   const [usersPagination, setUsersPagination] = useState({ page: 1, limit: PAGE_SIZE, total: 0, total_pages: 1 });
   const [questionsPagination, setQuestionsPagination] = useState({ page: 1, limit: PAGE_SIZE, total: 0, total_pages: 1 });
   const [feedbackPagination, setFeedbackPagination] = useState({ page: 1, limit: PAGE_SIZE, total: 0, total_pages: 1 });
@@ -60,6 +62,8 @@ const AdminPanel = () => {
   const [recipientUsers, setRecipientUsers] = useState([]);
   const [notifyMessage, setNotifyMessage] = useState("");
   const [sendingNotification, setSendingNotification] = useState(false);
+  const [newStoryTypeName, setNewStoryTypeName] = useState("");
+  const [creatingStoryType, setCreatingStoryType] = useState(false);
   const [actionMessage, setActionMessage] = useState("");
 
   const authHeaders = useMemo(
@@ -114,6 +118,13 @@ const AdminPanel = () => {
     setRecipientUsers(data.users || []);
   };
 
+  const fetchStoryTypes = async () => {
+    const response = await fetch(`${API_BASE_URL}/categories`, { headers: authHeaders });
+    if (!response.ok) throw new Error("Failed to load story types");
+    const data = await response.json();
+    setStoryTypes(data.data || []);
+  };
+
   const loadAll = async () => {
     setLoading(true);
     setError("");
@@ -143,6 +154,12 @@ const AdminPanel = () => {
     fetchRecipientUsers().catch((err) => setError(err.message || "Failed to load recipients"));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [canAccess, activePage, recipientSearch]);
+
+  useEffect(() => {
+    if (!canAccess || activePage !== "story-types") return;
+    fetchStoryTypes().catch((err) => setError(err.message || "Failed to load story types"));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [canAccess, activePage]);
 
   useEffect(() => {
     setIsMobileSidebarOpen(false);
@@ -242,6 +259,36 @@ const AdminPanel = () => {
       setActionMessage(err.message || "Failed to send notification");
     } finally {
       setSendingNotification(false);
+    }
+  };
+
+  const handleCreateStoryType = async (e) => {
+    e.preventDefault();
+    if (!newStoryTypeName.trim() || creatingStoryType) return;
+
+    setCreatingStoryType(true);
+    setActionMessage("");
+    try {
+      const response = await fetch(`${API_BASE_URL}/categories`, {
+        method: "POST",
+        headers: authHeaders,
+        body: JSON.stringify({ name: newStoryTypeName.trim(), email: storedEmail })
+      });
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}));
+        throw new Error(data.message || "Failed to create story type");
+      }
+      const data = await response.json();
+      setStoryTypes((prev) => {
+        const next = [...prev, data.category].filter(Boolean);
+        return next.sort((a, b) => String(a.name).localeCompare(String(b.name)));
+      });
+      setNewStoryTypeName("");
+      setActionMessage("Story type added");
+    } catch (err) {
+      setActionMessage(err.message || "Failed to create story type");
+    } finally {
+      setCreatingStoryType(false);
     }
   };
 
@@ -353,6 +400,16 @@ const AdminPanel = () => {
           >
             <FaInbox size={13} />
             Feedback
+          </button>
+          <button
+            type="button"
+            onClick={() => setActivePage("story-types")}
+            className={`mt-2 inline-flex w-full items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium transition ${
+              activePage === "story-types" ? "bg-rose-500/20 text-rose-100" : "text-slate-300 hover:bg-white/5"
+            }`}
+          >
+            <FaTags size={13} />
+            Story Types
           </button>
         </aside>
 
@@ -471,6 +528,35 @@ const AdminPanel = () => {
             ))}
           </div>
           <PaginationControls pagination={feedbackPagination} onChangePage={setFeedbackPage} />
+        </section>
+        )}
+
+        {activePage === "story-types" && (
+        <section className="rounded-2xl border border-white/10 bg-slate-900/60 p-5">
+          <h2 className="mb-3 text-lg font-semibold text-slate-100">Story Types</h2>
+          <form onSubmit={handleCreateStoryType} className="mb-4 flex flex-wrap items-center gap-2">
+            <input
+              value={newStoryTypeName}
+              onChange={(e) => setNewStoryTypeName(e.target.value)}
+              placeholder="New story type name"
+              className="min-w-[220px] flex-1 rounded-xl border border-white/10 bg-slate-950/70 px-4 py-2.5 text-sm outline-none focus:border-rose-300/40"
+            />
+            <button
+              type="submit"
+              disabled={creatingStoryType || !newStoryTypeName.trim()}
+              className="inline-flex items-center rounded-full bg-gradient-to-r from-rose-500 to-rose-400 px-4 py-2 text-xs font-semibold text-white transition hover:from-rose-600 hover:to-rose-500 disabled:opacity-60"
+            >
+              {creatingStoryType ? "Adding..." : "Add Story Type"}
+            </button>
+          </form>
+          <div className="space-y-2">
+            {storyTypes.map((category) => (
+              <article key={category.id} className="rounded-xl border border-white/10 bg-slate-950/50 p-3">
+                <p className="text-sm text-slate-100">{category.name}</p>
+                <p className="mt-1 text-xs text-slate-400">ID: {category.id} | Slug: {category.slug}</p>
+              </article>
+            ))}
+          </div>
         </section>
         )}
 
