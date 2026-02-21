@@ -8,11 +8,30 @@ import {
   FaShareAlt
 } from "react-icons/fa";
 
+const API_BASE_URL = "http://localhost:3000/api";
+
 const SharePopup = ({ regretId, regretTitle }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const shareUrl = `${window.location.origin}/regrets/${regretId}`;
   const shareText = `Check out this regret: "${regretTitle}" on Regrets.in`;
+
+  const trackShare = async () => {
+    if (!regretId) return;
+    const token = localStorage.getItem("auth_token");
+    const storedEmail = localStorage.getItem("useremail");
+    try {
+      await fetch(`${API_BASE_URL}/questions/${regretId}/share${storedEmail ? `?email=${encodeURIComponent(storedEmail)}` : ""}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {})
+        }
+      });
+    } catch {
+      // no-op
+    }
+  };
 
   const togglePopup = (e) => {
     e.stopPropagation();
@@ -23,6 +42,7 @@ const SharePopup = ({ regretId, regretTitle }) => {
     e.stopPropagation();
     try {
       await navigator.clipboard.writeText(shareUrl);
+      trackShare();
       setIsOpen(false);
     } catch (_err) {
       // Ignore clipboard errors silently.
@@ -34,6 +54,7 @@ const SharePopup = ({ regretId, regretTitle }) => {
     if (navigator.share) {
       try {
         await navigator.share({ title: regretTitle, text: shareText, url: shareUrl });
+        trackShare();
       } catch (_error) {
         // no-op
       }
@@ -45,6 +66,7 @@ const SharePopup = ({ regretId, regretTitle }) => {
   const shareToWhatsApp = (e) => {
     e.stopPropagation();
     window.open(`https://wa.me/?text=${encodeURIComponent(`${shareText} ${shareUrl}`)}`, "_blank");
+    trackShare();
     setIsOpen(false);
   };
 
@@ -54,6 +76,7 @@ const SharePopup = ({ regretId, regretTitle }) => {
       `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`,
       "_blank"
     );
+    trackShare();
     setIsOpen(false);
   };
 
