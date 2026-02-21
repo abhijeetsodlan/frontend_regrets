@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { FaRegHeart, FaHeart, FaArrowLeft, FaPaperPlane, FaUserSecret } from "react-icons/fa";
+import { FaHeartBroken, FaArrowLeft, FaPaperPlane, FaUserSecret } from "react-icons/fa";
 import SharePopup from "../../components/SharePopUp";
 import SeoMeta from "../../components/SeoMeta";
 
@@ -16,6 +16,8 @@ const RegretDetailPage = () => {
   const [isAnonymousReply, setIsAnonymousReply] = useState(true);
   const [comments, setComments] = useState([]);
   const [submittingReply, setSubmittingReply] = useState(false);
+  const [likeIconScale, setLikeIconScale] = useState(1);
+  const likeAnimTimeoutRef = useRef(null);
 
   const navigate = useNavigate();
   const token = localStorage.getItem("auth_token");
@@ -56,11 +58,29 @@ const RegretDetailPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [regret_id]);
 
+  useEffect(() => {
+    return () => {
+      if (likeAnimTimeoutRef.current) {
+        clearTimeout(likeAnimTimeoutRef.current);
+      }
+    };
+  }, []);
+
   const handleLike = async (e) => {
     e.preventDefault();
     if (!regret) return;
 
     const newLikedStatus = !regret.liked_by_user;
+    if (newLikedStatus) {
+      if (likeAnimTimeoutRef.current) {
+        clearTimeout(likeAnimTimeoutRef.current);
+      }
+      setLikeIconScale(1.3);
+      likeAnimTimeoutRef.current = setTimeout(() => {
+        setLikeIconScale(1);
+        likeAnimTimeoutRef.current = null;
+      }, 220);
+    }
     setRegret((prev) => ({
       ...prev,
       liked_by_user: newLikedStatus,
@@ -213,7 +233,11 @@ const RegretDetailPage = () => {
                   : "border-white/10 bg-slate-900/55 text-slate-300 hover:border-white/20 hover:bg-slate-800 hover:text-white"
               }`}
             >
-              {regret.liked_by_user ? <FaHeart size={14} className="text-rose-300" /> : <FaRegHeart size={14} />}
+              <FaHeartBroken
+                size={14}
+                className={regret.liked_by_user ? "text-rose-300" : ""}
+                style={{ transform: `scale(${likeIconScale})`, transition: "transform 220ms ease" }}
+              />
               <span>{regret.likes_count || 0}</span>
             </button>
 
