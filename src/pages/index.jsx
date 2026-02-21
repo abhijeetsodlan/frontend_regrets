@@ -206,13 +206,12 @@ const QuestionsPage = () => {
 
     if (pullDistance >= 70 && !isRefreshing) {
       setIsRefreshing(true);
-      setPullDistance(56);
+      setPullDistance(52);
       await loadQuestions({ showPageLoader: false });
-      showSuccessToast("Refreshed regrets");
       setIsRefreshing(false);
     }
     setPullDistance(0);
-  }, [isRefreshing, loadQuestions, pullDistance, showSuccessToast]);
+  }, [isRefreshing, loadQuestions, pullDistance]);
 
   useEffect(() => {
     if (!token) {
@@ -302,17 +301,19 @@ const QuestionsPage = () => {
 
       {(pullDistance > 0 || isRefreshing) && (
         <div
-          className="fixed left-1/2 top-16 z-[74] flex -translate-x-1/2 items-center gap-2 rounded-full border border-white/10 bg-slate-900/85 px-4 py-2 text-xs text-slate-200 shadow-xl"
-          style={{ transform: `translate(-50%, ${Math.max(0, pullDistance - 54)}px)` }}
+          className="fixed left-1/2 top-16 z-[74] flex -translate-x-1/2 items-center justify-center rounded-full border border-white/10 bg-slate-900/85 p-2 text-slate-200 shadow-xl transition-all duration-150"
+          style={{
+            transform: `translate(-50%, ${Math.max(0, pullDistance - 50)}px) scale(${isRefreshing ? 1 : Math.min(1, 0.72 + pullDistance / 180)})`,
+            opacity: isRefreshing ? 1 : Math.min(1, pullDistance / 70)
+          }}
         >
-          <FaSyncAlt className={isRefreshing ? "animate-spin" : ""} size={12} />
-          <span>{isRefreshing ? "Refreshing..." : pullDistance >= 70 ? "Release to refresh" : "Pull to refresh"}</span>
+          <FaSyncAlt className="animate-spin" size={14} />
         </div>
       )}
 
       <div
-        className="mx-auto w-full max-w-4xl px-4 pb-10 pt-8 transition-transform duration-150 sm:px-6"
-        style={{ transform: `translateY(${isRefreshing ? 14 : pullDistance}px)` }}
+        className="mx-auto w-full max-w-4xl px-4 pb-10 pt-8 transition-transform duration-200 ease-out sm:px-6"
+        style={{ transform: `translateY(${isRefreshing ? 12 : pullDistance}px)` }}
       >
         <div className="mb-4 hidden justify-end sm:flex">
           <AddRegretButton onClick={handleAddRegret} />
