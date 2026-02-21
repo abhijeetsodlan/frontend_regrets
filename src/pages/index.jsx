@@ -206,7 +206,10 @@ const QuestionsPage = () => {
 
     if (pullDistance >= 70 && !isRefreshing) {
       setIsRefreshing(true);
-      setPullDistance(52);
+      setPullDistance(0);
+      if (navigator.vibrate) {
+        navigator.vibrate(18);
+      }
       await loadQuestions({ showPageLoader: false });
       setIsRefreshing(false);
     }
@@ -307,13 +310,13 @@ const QuestionsPage = () => {
             opacity: isRefreshing ? 1 : Math.min(1, pullDistance / 70)
           }}
         >
-          <FaSyncAlt className="animate-spin" size={14} />
+          <FaSyncAlt className="animate-spin" size={18} />
         </div>
       )}
 
       <div
         className="mx-auto w-full max-w-4xl px-4 pb-10 pt-8 transition-transform duration-200 ease-out sm:px-6"
-        style={{ transform: `translateY(${isRefreshing ? 12 : pullDistance}px)` }}
+        style={{ transform: `translateY(${isRefreshing ? 0 : pullDistance}px)` }}
       >
         <div className="mb-4 hidden justify-end sm:flex">
           <AddRegretButton onClick={handleAddRegret} />
