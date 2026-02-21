@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { FaUserSecret, FaSyncAlt } from "react-icons/fa";
+import { FaUserSecret, FaSyncAlt, FaCrown } from "react-icons/fa";
 import CheckAuthModal from "../../components/CheckAuth";
 import SharePopup from "../../components/SharePopUp";
 import SaveButton from "../../components/SaveButton";
@@ -19,6 +19,7 @@ const QuestionsPage = () => {
   const [likes, setLikes] = useState({});
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [categories, setCategories] = useState([]);
+  const [topRegretOfDay, setTopRegretOfDay] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
   const [showToast, setShowToast] = useState(false);
@@ -61,6 +62,11 @@ const QuestionsPage = () => {
       const response = await axios.get(apiUrl, getApiConfig());
       const fetchedQuestions = response.data.questions || [];
       setQuestions(fetchedQuestions);
+      if (selectedCategory === "All") {
+        setTopRegretOfDay(response.data.top_regret_of_day || null);
+      } else {
+        setTopRegretOfDay(null);
+      }
       setLikes(
         fetchedQuestions.reduce(
           (acc, q) => ({
@@ -165,7 +171,8 @@ const QuestionsPage = () => {
     setIsModalOpen(false);
     upsertQuestionInFeed(question);
     showSuccessToast("Regret posted");
-  }, [showSuccessToast, upsertQuestionInFeed]);
+    loadQuestions({ showPageLoader: false });
+  }, [loadQuestions, showSuccessToast, upsertQuestionInFeed]);
 
   const handleTouchStart = useCallback((event) => {
     if (window.innerWidth >= 640 || isRefreshing) {
@@ -276,6 +283,11 @@ const QuestionsPage = () => {
     });
   };
 
+  const topQuestion = topRegretOfDay?.question || null;
+  const visibleQuestions = topQuestion
+    ? questions.filter((question) => question.id !== topQuestion.id)
+    : questions;
+
   return (
     <div
       className="min-h-screen bg-gradient-to-b from-slate-950 via-[#090b12] to-slate-950 text-white"
@@ -333,13 +345,70 @@ const QuestionsPage = () => {
           <div className="rounded-2xl border border-white/10 bg-slate-900/45 px-4 py-8 text-center text-lg font-medium text-slate-300">
             Loading regrets...
           </div>
-        ) : questions.length === 0 ? (
+        ) : visibleQuestions.length === 0 && !topQuestion ? (
           <div className="rounded-2xl border border-white/10 bg-slate-900/45 px-4 py-8 text-center text-slate-400">
             No regrets found in this story type.
           </div>
         ) : (
           <div className="space-y-5">
-            {questions.map((question) => (
+            {topQuestion && (
+              <article
+                key={`top-${topQuestion.id}`}
+                onClick={() => navigate(`/regrets/${topQuestion.id}`)}
+                className="group cursor-pointer rounded-2xl border border-amber-300/35 bg-gradient-to-r from-amber-500/15 via-orange-400/10 to-rose-500/10 p-5 shadow-[0_18px_45px_rgba(0,0,0,0.35)] backdrop-blur transition-all duration-300 hover:-translate-y-0.5 hover:border-amber-300/50 sm:p-6"
+              >
+                <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-amber-200/40 bg-amber-400/15 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-amber-100">
+                  <FaCrown size={11} />
+                  Currently Echoing the Loudest
+                </div>
+                {topQuestion.is_anonymous ? (
+                  <div className="mb-4 flex items-center">
+                    <div className="flex h-11 w-11 items-center justify-center rounded-full bg-slate-700 text-slate-200">
+                      <FaUserSecret size={18} />
+                    </div>
+                    <div className="ml-3">
+                      <p className="text-lg font-semibold leading-none">Anonymous</p>
+                    </div>
+                  </div>
+                ) : (
+                  topQuestion.user && (
+                    <div className="mb-4 flex items-center">
+                      <div className="flex h-11 w-11 items-center justify-center overflow-hidden rounded-full bg-rose-500 text-base font-bold text-white">
+                        {topQuestion.user.avatar ? (
+                          <span className="text-lg leading-none">{topQuestion.user.avatar}</span>
+                        ) : (
+                          topQuestion.user.name.charAt(0)
+                        )}
+                      </div>
+                      <div className="ml-3">
+                        <p className="text-lg font-semibold leading-none">{topQuestion.user.name}</p>
+                        <p className="mt-1 text-xs uppercase tracking-wide text-amber-100/80">
+                          {formatCreatedDate(topQuestion.created_at)}
+                        </p>
+                      </div>
+                    </div>
+                  )
+                )}
+                <p className="mb-5 text-left text-xl leading-relaxed text-slate-100 sm:text-2xl">
+                  {topQuestion.title}
+                </p>
+                <div className="flex w-full items-center gap-2 border-t border-amber-100/20 pt-4 sm:gap-3">
+                  <LikeButton questionId={topQuestion.id} likes={likes} handleLike={handleLike} />
+                  <CommentButton
+                    questionId={topQuestion.id}
+                    onNavigate={navigate}
+                    repliesCount={topQuestion.replies_count || 0}
+                  />
+                  <SharePopup regretId={topQuestion.id} regretTitle={topQuestion.title} />
+                  <SaveButton
+                    questionId={topQuestion.id}
+                    initiallySaved={topQuestion.is_saved || false}
+                    onRequireAuth={() => setIsModalOpen(true)}
+                  />
+                </div>
+              </article>
+            )}
+            {visibleQuestions.map((question) => (
               <article
                 key={question.id}
                 onClick={() => navigate(`/regrets/${question.id}`)}
