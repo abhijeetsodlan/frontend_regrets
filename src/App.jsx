@@ -10,6 +10,7 @@ import QuestionsPage from "./pages/index";
 import RegretDetailPage from "./pages/regretDetailPage";
 import GetStarted from "./pages/getStarted";
 import MyProfile from "./pages/myProfile";
+import ChooseAvatarPage from "./pages/chooseAvatar";
 import PrivacyPolicy from "./pages/privacyPolicy";
 import AdminPanel from "./pages/adminPanel";
 import SmoothScroll from "./SmoothScroll";
@@ -113,6 +114,16 @@ function App() {
               <ProtectedRoute>
                 <DefaultLayout>
                   <MyProfile />
+                </DefaultLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/choose-avatar"
+            element={
+              <ProtectedRoute>
+                <DefaultLayout>
+                  <ChooseAvatarPage />
                 </DefaultLayout>
               </ProtectedRoute>
             }
