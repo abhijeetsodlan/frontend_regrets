@@ -25,6 +25,7 @@ const AVATAR_OPTIONS = [
 
 const AvatarOnboardingModal = ({
   isOpen,
+  inline = false,
   onSaved,
   onSkip,
   showSkip = true,
@@ -75,9 +76,8 @@ const AvatarOnboardingModal = ({
     }
   };
 
-  return (
-    <div className="fixed inset-0 z-[90] overflow-y-auto bg-black/75 px-3 py-4 backdrop-blur-sm sm:flex sm:items-center sm:justify-center sm:px-4">
-      <div className="mx-auto w-full max-w-md rounded-2xl border border-white/10 bg-slate-950/95 p-4 text-white shadow-[0_24px_60px_rgba(0,0,0,0.55)] sm:p-6">
+  const content = (
+    <div className="my-auto w-full max-w-md max-h-[92vh] overflow-y-auto rounded-2xl border border-white/10 bg-slate-950/95 p-4 text-white shadow-[0_24px_60px_rgba(0,0,0,0.55)] sm:p-6">
         <h3 className="text-xl font-semibold text-slate-100">{title}</h3>
         <p className="mt-1 text-sm text-slate-400">
           {subtitle}
@@ -127,7 +127,16 @@ const AvatarOnboardingModal = ({
             {saving ? "Saving..." : saveLabel}
           </button>
         </div>
-      </div>
+    </div>
+  );
+
+  if (inline) {
+    return content;
+  }
+
+  return (
+    <div className="fixed inset-0 z-[90] flex items-center justify-center overflow-y-auto bg-black/75 p-3 backdrop-blur-sm sm:p-4">
+      {content}
     </div>
   );
 };

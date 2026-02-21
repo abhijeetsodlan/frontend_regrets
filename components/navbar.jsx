@@ -4,7 +4,6 @@ import { FaBell, FaCommentDots } from "react-icons/fa";
 import LoginModal from "./Login";
 import Logout from "./Logout"; // Import the Logout component
 import FeedbackWidget from "./FeedbackWidget";
-import AvatarOnboardingModal from "./AvatarOnboardingModal";
 
 const API_BASE_URL = "http://localhost:3000/api";
 
@@ -19,7 +18,6 @@ const Navbar = () => {
   const [animateBell, setAnimateBell] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
-  const [showAvatarOnboarding, setShowAvatarOnboarding] = useState(false);
   const [profileAvatar, setProfileAvatar] = useState("");
   const [profileInitial, setProfileInitial] = useState("U");
   const menuRef = useRef(null);
@@ -175,7 +173,6 @@ const Navbar = () => {
     const token = localStorage.getItem("auth_token");
     const storedEmail = localStorage.getItem("useremail");
     if (!token) {
-      setShowAvatarOnboarding(false);
       return;
     }
 
@@ -198,7 +195,10 @@ const Navbar = () => {
       }
       syncProfileButton();
       const wasSkipped = localStorage.getItem(getAvatarSkipKey(storedEmail)) === "1";
-      setShowAvatarOnboarding(!avatar && !wasSkipped);
+      const shouldRedirect = !avatar && !wasSkipped && location.pathname !== "/choose-avatar";
+      if (shouldRedirect) {
+        navigate("/choose-avatar", { replace: true });
+      }
     } catch {
       // Silent fail for onboarding check.
     }
@@ -336,7 +336,6 @@ const Navbar = () => {
     setNotificationsOpen(false);
     setNotifications([]);
     setUnreadCount(0);
-    setShowAvatarOnboarding(false);
     setProfileAvatar("");
     setProfileInitial("U");
     localStorage.removeItem("user_avatar");
@@ -499,23 +498,6 @@ const Navbar = () => {
       <LoginModal
         isOpen={loginModalOpen}
         onClose={() => setLoginModalOpen(false)}
-      />
-      <AvatarOnboardingModal
-        isOpen={showAvatarOnboarding}
-        onSaved={(avatarValue) => {
-          const storedEmail = localStorage.getItem("useremail");
-          if (storedEmail) {
-            localStorage.removeItem(getAvatarSkipKey(storedEmail));
-          }
-          localStorage.setItem("user_avatar", avatarValue);
-          setProfileAvatar(avatarValue);
-          setShowAvatarOnboarding(false);
-        }}
-        onSkip={() => {
-          const storedEmail = localStorage.getItem("useremail");
-          localStorage.setItem(getAvatarSkipKey(storedEmail), "1");
-          setShowAvatarOnboarding(false);
-        }}
       />
     </nav>
   );
