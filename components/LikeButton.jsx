@@ -8,14 +8,15 @@ const LikeButton = ({ questionId, likes, handleLike }) => {
   return (
     <button
       onClick={(e) => handleLike(e, questionId)}
-      className={`inline-flex h-10 items-center gap-2 rounded-full border px-3 text-sm font-medium transition ${
+      aria-label={`Likes ${count}`}
+      className={`inline-flex h-10 w-10 items-center justify-center rounded-full border px-0 text-sm font-medium transition sm:w-auto sm:gap-2 sm:px-3 ${
         liked
           ? "border-rose-300/40 bg-rose-500/15 text-rose-200"
           : "border-white/10 bg-slate-900/55 text-slate-300 hover:border-white/20 hover:bg-slate-800 hover:text-white"
       }`}
     >
       {liked ? <FaHeart size={14} className="text-rose-300" /> : <FaRegHeart size={14} />}
-      <span>{count}</span>
+      <span className="hidden sm:inline">{count}</span>
     </button>
   );
 };

@@ -1,14 +1,169 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Link } from "react-router-dom";
-import { FaUserCircle } from "react-icons/fa";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { FaUserCircle, FaBell, FaCommentDots } from "react-icons/fa";
 import LoginModal from "./Login";
 import Logout from "./Logout"; // Import the Logout component
+import FeedbackWidget from "./FeedbackWidget";
+import AvatarOnboardingModal from "./AvatarOnboardingModal";
+
+const API_BASE_URL = "http://localhost:3000/api";
 
 const Navbar = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [loginModalOpen, setLoginModalOpen] = useState(false);
+  const [animateFeedback, setAnimateFeedback] = useState(false);
+  const [animateBell, setAnimateBell] = useState(false);
+  const [notifications, setNotifications] = useState([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [showAvatarOnboarding, setShowAvatarOnboarding] = useState(false);
   const menuRef = useRef(null);
+  const notificationsRef = useRef(null);
+  const wsRef = useRef(null);
+  const reconnectTimeoutRef = useRef(null);
+  const bellTimeoutRef = useRef(null);
+
+  const fetchNotifications = async () => {
+    const token = localStorage.getItem("auth_token");
+    const storedEmail = localStorage.getItem("useremail");
+    if (!token) {
+      setNotifications([]);
+      setUnreadCount(0);
+      return;
+    }
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/notifications?email=${encodeURIComponent(storedEmail || "")}`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      if (!response.ok) {
+        return;
+      }
+
+      const data = await response.json();
+      setNotifications(data.notifications || []);
+      setUnreadCount(data.unread_count || 0);
+    } catch {
+      // Silent fail for navbar polling.
+    }
+  };
+
+  const formatNotificationTime = (value) => {
+    const createdAt = new Date(value).getTime();
+    if (Number.isNaN(createdAt)) return "";
+    const diffMs = Date.now() - createdAt;
+    const diffMins = Math.floor(diffMs / 60000);
+    if (diffMins < 1) return "Just now";
+    if (diffMins < 60) return `${diffMins}m ago`;
+    const diffHours = Math.floor(diffMins / 60);
+    if (diffHours < 24) return `${diffHours}h ago`;
+    const diffDays = Math.floor(diffHours / 24);
+    return `${diffDays}d ago`;
+  };
+
+  const handleNotificationClick = async (notification) => {
+    const token = localStorage.getItem("auth_token");
+    const storedEmail = localStorage.getItem("useremail");
+    const targetQuestionId =
+      notification?.question_id ||
+      notification?.question?.id ||
+      notification?.question?._id ||
+      null;
+
+    if (!notification?.id || !targetQuestionId) {
+      return;
+    }
+
+    if (token && !notification.is_read) {
+      try {
+        await fetch(`${API_BASE_URL}/notifications/${notification.id}/read`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`
+          },
+          body: JSON.stringify({ email: storedEmail })
+        });
+      } catch {
+        // Keep navigation even when mark-read fails.
+      }
+    }
+
+    setNotifications((prev) =>
+      prev.map((row) => (row.id === notification.id ? { ...row, is_read: true } : row))
+    );
+    setUnreadCount((prev) => Math.max(0, prev - (notification.is_read ? 0 : 1)));
+    setNotificationsOpen(false);
+    navigate(`/regrets/${targetQuestionId}`);
+  };
+
+  const handleClearNotifications = async () => {
+    const token = localStorage.getItem("auth_token");
+    const storedEmail = localStorage.getItem("useremail");
+    if (!token) {
+      return;
+    }
+
+    try {
+      await fetch(`${API_BASE_URL}/notifications/clear`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ email: storedEmail })
+      });
+      setNotifications([]);
+      setUnreadCount(0);
+    } catch {
+      // Silent fail to keep navbar responsive.
+    }
+  };
+
+  const triggerBellAnimation = () => {
+    setAnimateBell(true);
+    if (bellTimeoutRef.current) {
+      clearTimeout(bellTimeoutRef.current);
+    }
+    bellTimeoutRef.current = setTimeout(() => {
+      setAnimateBell(false);
+    }, 1700);
+  };
+
+  const getAvatarSkipKey = (email) => `avatar_onboarding_skipped_${email || "unknown"}`;
+
+  const checkAvatarOnboarding = async () => {
+    const token = localStorage.getItem("auth_token");
+    const storedEmail = localStorage.getItem("useremail");
+    if (!token) {
+      setShowAvatarOnboarding(false);
+      return;
+    }
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/me?email=${encodeURIComponent(storedEmail || "")}`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      if (!response.ok) {
+        return;
+      }
+
+      const data = await response.json();
+      const avatar = data?.user?.avatar || "";
+      localStorage.setItem("user_avatar", avatar);
+      const wasSkipped = localStorage.getItem(getAvatarSkipKey(storedEmail)) === "1";
+      setShowAvatarOnboarding(!avatar && !wasSkipped);
+    } catch {
+      // Silent fail for onboarding check.
+    }
+  };
 
   useEffect(() => {
     const token = localStorage.getItem("auth_token");
@@ -18,15 +173,133 @@ const Navbar = () => {
       if (menuRef.current && !menuRef.current.contains(event.target)) {
         setMenuOpen(false);
       }
+      if (notificationsRef.current && !notificationsRef.current.contains(event.target)) {
+        setNotificationsOpen(false);
+      }
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  useEffect(() => {
+    const token = localStorage.getItem("auth_token");
+    setIsLoggedIn(!!token);
+    if (token) {
+      checkAvatarOnboarding();
+    }
+  }, [location.pathname]);
+
+  useEffect(() => {
+    if (!isLoggedIn) {
+      return undefined;
+    }
+
+    fetchNotifications();
+    const timer = setInterval(fetchNotifications, 20000);
+    return () => clearInterval(timer);
+  }, [isLoggedIn]);
+
+  useEffect(() => {
+    if (!isLoggedIn) {
+      if (wsRef.current) {
+        wsRef.current.close();
+        wsRef.current = null;
+      }
+      if (reconnectTimeoutRef.current) {
+        clearTimeout(reconnectTimeoutRef.current);
+        reconnectTimeoutRef.current = null;
+      }
+      return undefined;
+    }
+
+    let cancelled = false;
+
+    const connectSocket = () => {
+      const token = localStorage.getItem("auth_token");
+      if (!token || cancelled) {
+        return;
+      }
+
+      const apiUrl = new URL(API_BASE_URL);
+      const wsProtocol = apiUrl.protocol === "https:" ? "wss:" : "ws:";
+      const wsUrl = `${wsProtocol}//${apiUrl.host}/ws?token=${encodeURIComponent(token)}`;
+      const socket = new WebSocket(wsUrl);
+      wsRef.current = socket;
+
+      socket.onmessage = (event) => {
+        try {
+          const payload = JSON.parse(event.data || "{}");
+          if (payload.type !== "notification:new" || !payload.notification) {
+            return;
+          }
+
+          const incoming = payload.notification;
+          setNotifications((prev) => {
+            const alreadyExists = prev.some((row) => row.id === incoming.id);
+            if (alreadyExists) {
+              return prev;
+            }
+            return [incoming, ...prev].slice(0, 50);
+          });
+          setUnreadCount((prev) => prev + 1);
+          triggerBellAnimation();
+        } catch {
+          // Ignore malformed event payloads.
+        }
+      };
+
+      socket.onclose = () => {
+        if (cancelled) {
+          return;
+        }
+        reconnectTimeoutRef.current = setTimeout(connectSocket, 2500);
+      };
+
+      socket.onerror = () => {
+        socket.close();
+      };
+    };
+
+    connectSocket();
+
+    return () => {
+      cancelled = true;
+      if (reconnectTimeoutRef.current) {
+        clearTimeout(reconnectTimeoutRef.current);
+        reconnectTimeoutRef.current = null;
+      }
+      if (wsRef.current) {
+        wsRef.current.close();
+        wsRef.current = null;
+      }
+      if (bellTimeoutRef.current) {
+        clearTimeout(bellTimeoutRef.current);
+      }
+    };
+  }, [isLoggedIn]);
+
+  useEffect(() => {
+    const intervalRef = setInterval(() => {
+      setAnimateFeedback(true);
+      setTimeout(() => setAnimateFeedback(false), 1800);
+    }, 12000);
+
+    return () => clearInterval(intervalRef);
+  }, []);
+
   // Callback to handle logout success
   const handleLogoutSuccess = () => {
+    const storedEmail = localStorage.getItem("useremail");
     setIsLoggedIn(false);
     setMenuOpen(false);
+    setNotificationsOpen(false);
+    setNotifications([]);
+    setUnreadCount(0);
+    setShowAvatarOnboarding(false);
+    localStorage.removeItem("user_avatar");
+    if (storedEmail) {
+      localStorage.removeItem(getAvatarSkipKey(storedEmail));
+    }
   };
 
   return (
@@ -41,26 +314,113 @@ const Navbar = () => {
         </Link>
 
         {/* Right Side: User Icon or Login Button */}
-        <div className="relative" ref={menuRef}>
+        <div className="flex items-center gap-3">
+          <FeedbackWidget
+            showFloating={false}
+            renderTrigger={(openFeedback) => (
+              <button
+                type="button"
+                onClick={() => {
+                  openFeedback();
+                  setMenuOpen(false);
+                  setNotificationsOpen(false);
+                }}
+                className={`relative inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-black/40 text-slate-200 transition hover:border-rose-400/40 hover:text-rose-300 ${
+                  animateFeedback ? "animate-bounce border-rose-300/50 text-rose-300 shadow-[0_0_0_4px_rgba(251,113,133,0.18)]" : ""
+                }`}
+                aria-label="Give feedback"
+                title="Give feedback"
+              >
+                <FaCommentDots size={15} />
+              </button>
+            )}
+          />
+
           {isLoggedIn ? (
-            <div className="relative">
-              <FaUserCircle
-                className="text-3xl cursor-pointer hover:text-rose-400 transition-all duration-300"
-                onClick={() => setMenuOpen(!menuOpen)}
-              />
-              {menuOpen && (
-                <div className="absolute right-0 mt-3 w-48 bg-black/70 backdrop-blur-md rounded-xl shadow-2xl p-3 transition-all duration-300 transform origin-top scale-100 opacity-100 border border-gray-700">
-                  <Link
-                    to="/myProfile"
-                    className="block w-full text-center px-4 py-2 text-gray-200 hover:bg-gray-700 hover:text-white rounded-lg transition-all duration-200"
-                    onClick={() => setMenuOpen(false)}
-                  >
-                    My Profile
-                  </Link>
-                  <Logout onLogout={handleLogoutSuccess} />
-                </div>
-              )}
-            </div>
+            <>
+              <div className="relative" ref={notificationsRef}>
+                <button
+                  type="button"
+                  className={`relative inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-black/40 text-slate-200 transition hover:border-rose-400/40 hover:text-rose-300 ${
+                    animateBell ? "animate-bounce border-rose-300/50 text-rose-300 shadow-[0_0_0_4px_rgba(251,113,133,0.18)]" : ""
+                  }`}
+                  onClick={() => {
+                    setNotificationsOpen((prev) => !prev);
+                    setMenuOpen(false);
+                  }}
+                >
+                  <FaBell size={16} />
+                  {unreadCount > 0 && (
+                    <span className="absolute -right-1 -top-1 min-w-5 rounded-full bg-rose-500 px-1.5 text-center text-[10px] font-bold leading-5 text-white">
+                      {unreadCount > 99 ? "99+" : unreadCount}
+                    </span>
+                  )}
+                </button>
+                {notificationsOpen && (
+                  <div className="fixed left-3 right-3 top-16 z-[70] rounded-xl border border-gray-700 bg-black/85 p-2 shadow-2xl backdrop-blur-md sm:absolute sm:left-auto sm:right-0 sm:top-full sm:mt-3 sm:w-[22rem] sm:max-w-[92vw]">
+                    <div className="mb-2 flex items-center justify-between px-2">
+                      <p className="text-sm font-semibold text-slate-100">Notifications</p>
+                      {notifications.length > 0 && (
+                        <button
+                          type="button"
+                          onClick={handleClearNotifications}
+                          className="rounded-full border border-white/15 px-2.5 py-1 text-[11px] font-semibold text-slate-300 transition hover:border-rose-300/40 hover:text-rose-100"
+                        >
+                          Clear
+                        </button>
+                      )}
+                    </div>
+                    {notifications.length === 0 ? (
+                      <p className="rounded-lg bg-slate-900/50 px-3 py-4 text-center text-sm text-slate-400">
+                        No notifications yet.
+                      </p>
+                    ) : (
+                      <div className="max-h-[60vh] space-y-1 overflow-y-auto pr-1 sm:max-h-80">
+                        {notifications.map((notification) => (
+                          <button
+                            key={notification.id}
+                            type="button"
+                            onClick={() => handleNotificationClick(notification)}
+                            className={`w-full rounded-lg border px-3 py-2 text-left transition ${
+                              notification.is_read
+                                ? "border-white/5 bg-slate-900/35 text-slate-300 hover:bg-slate-900/60"
+                                : "border-rose-400/25 bg-rose-500/10 text-rose-100 hover:bg-rose-500/20"
+                            }`}
+                          >
+                            <p className="text-sm leading-5">{notification.message}</p>
+                            <p className="mt-1 text-xs text-slate-400">
+                              {formatNotificationTime(notification.created_at)}
+                            </p>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              <div className="relative" ref={menuRef}>
+                <FaUserCircle
+                  className="text-3xl cursor-pointer hover:text-rose-400 transition-all duration-300"
+                  onClick={() => {
+                    setMenuOpen(!menuOpen);
+                    setNotificationsOpen(false);
+                  }}
+                />
+                {menuOpen && (
+                  <div className="absolute right-0 mt-3 w-48 bg-black/70 backdrop-blur-md rounded-xl shadow-2xl p-3 transition-all duration-300 transform origin-top scale-100 opacity-100 border border-gray-700">
+                    <Link
+                      to="/myProfile"
+                      className="block w-full text-center px-4 py-2 text-gray-200 hover:bg-gray-700 hover:text-white rounded-lg transition-all duration-200"
+                      onClick={() => setMenuOpen(false)}
+                    >
+                      My Profile
+                    </Link>
+                    <Logout onLogout={handleLogoutSuccess} />
+                  </div>
+                )}
+              </div>
+            </>
           ) : (
             <button
               className="bg-rose-500 px-6 py-2 rounded-full font-medium text-white hover:bg-rose-600 shadow-lg transition-all duration-300 hover:shadow-rose-500/20"
@@ -76,6 +436,22 @@ const Navbar = () => {
       <LoginModal
         isOpen={loginModalOpen}
         onClose={() => setLoginModalOpen(false)}
+      />
+      <AvatarOnboardingModal
+        isOpen={showAvatarOnboarding}
+        onSaved={(avatarValue) => {
+          const storedEmail = localStorage.getItem("useremail");
+          if (storedEmail) {
+            localStorage.removeItem(getAvatarSkipKey(storedEmail));
+          }
+          localStorage.setItem("user_avatar", avatarValue);
+          setShowAvatarOnboarding(false);
+        }}
+        onSkip={() => {
+          const storedEmail = localStorage.getItem("useremail");
+          localStorage.setItem(getAvatarSkipKey(storedEmail), "1");
+          setShowAvatarOnboarding(false);
+        }}
       />
     </nav>
   );

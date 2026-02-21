@@ -73,13 +73,17 @@ const SharePopup = ({ regretId, regretTitle }) => {
   }, [isOpen]);
 
   const baseButtonClass =
-    "inline-flex h-10 items-center gap-2 rounded-full border border-white/10 bg-slate-900/55 px-3 text-sm font-medium text-slate-300 transition hover:border-white/20 hover:bg-slate-800 hover:text-white";
+    "inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-slate-900/55 px-0 text-sm font-medium text-slate-300 transition hover:border-white/20 hover:bg-slate-800 hover:text-white sm:w-auto sm:gap-2 sm:px-3";
 
   return (
     <div className="relative">
-      <button onClick={navigator.share ? shareViaNavigator : togglePopup} className={baseButtonClass}>
+      <button
+        onClick={navigator.share ? shareViaNavigator : togglePopup}
+        className={baseButtonClass}
+        aria-label="Share"
+      >
         <FaShareAlt size={14} />
-        <span>Share</span>
+        <span className="hidden sm:inline">Share</span>
       </button>
 
       {isOpen && (
@@ -131,4 +135,3 @@ const SharePopup = ({ regretId, regretTitle }) => {
 };
 
 export default SharePopup;
-

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { FaTimes, FaUserSecret } from "react-icons/fa";
 
-export default function CreateQuestionModal({ onClose }) {
+export default function CreateQuestionModal({ onClose, onQuestionCreated }) {
   const [title, setTitle] = useState("");
   const [categoryId, setCategoryId] = useState("");
   const [isAnonymous, setIsAnonymous] = useState(false);
@@ -48,12 +48,15 @@ export default function CreateQuestionModal({ onClose }) {
         requestData.is_anonymous = 1;
       }
 
-      await axios.post("http://localhost:3000/api/question", requestData, {
+      const response = await axios.post("http://localhost:3000/api/question", requestData, {
         headers: {
           Authorization: `Bearer ${token}`,
           Accept: "application/json"
         }
       });
+      if (onQuestionCreated && response.data?.question) {
+        onQuestionCreated(response.data.question);
+      }
       onClose();
     } catch (err) {
       setError(err.response?.data?.message || "Failed to create question. Please try again.");

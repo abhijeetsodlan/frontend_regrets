@@ -183,8 +183,12 @@ const RegretDetailPage = () => {
                 <FaUserSecret size={18} />
               </div>
             ) : (
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-rose-500 text-base font-bold text-white">
-                {regret.user?.name?.charAt(0) || "U"}
+              <div className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-full bg-rose-500 text-base font-bold text-white">
+                {regret.user?.avatar ? (
+                  <span className="text-xl leading-none">{regret.user.avatar}</span>
+                ) : (
+                  regret.user?.name?.charAt(0) || "U"
+                )}
               </div>
             )}
 
@@ -276,8 +280,12 @@ const RegretDetailPage = () => {
                         <FaUserSecret size={12} />
                       </div>
                     ) : (
-                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-rose-500 text-xs font-bold text-white">
-                        {comment.user?.name?.charAt(0) || "U"}
+                      <div className="flex h-8 w-8 items-center justify-center overflow-hidden rounded-full bg-rose-500 text-xs font-bold text-white">
+                        {comment.user?.avatar ? (
+                          <span className="text-sm leading-none">{comment.user.avatar}</span>
+                        ) : (
+                          comment.user?.name?.charAt(0) || "U"
+                        )}
                       </div>
                     )}
                     <div className="ml-2">

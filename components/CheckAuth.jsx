@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import AddNewQuestion from "../components/AddnewQuestion";
 import Login from "./Login";
 
-const CheckAuthModal = ({ isOpen, onClose }) => {
+const CheckAuthModal = ({ isOpen, onClose, onQuestionCreated }) => {
   const [token, setToken] = useState(null);
 
   useEffect(() => {
@@ -22,7 +22,7 @@ const CheckAuthModal = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
 
   return token ? (
-    <AddNewQuestion isOpen={isOpen} onClose={onClose} />
+    <AddNewQuestion isOpen={isOpen} onClose={onClose} onQuestionCreated={onQuestionCreated} />
   ) : (
     <Login isOpen={isOpen} onClose={onClose} onLoginSuccess={handleLoginSuccess} />
   );
