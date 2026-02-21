@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { FaUserCircle, FaBell, FaCommentDots } from "react-icons/fa";
+import { FaBell, FaCommentDots } from "react-icons/fa";
 import LoginModal from "./Login";
 import Logout from "./Logout"; // Import the Logout component
 import FeedbackWidget from "./FeedbackWidget";
@@ -20,6 +20,8 @@ const Navbar = () => {
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [showAvatarOnboarding, setShowAvatarOnboarding] = useState(false);
+  const [profileAvatar, setProfileAvatar] = useState("");
+  const [profileInitial, setProfileInitial] = useState("U");
   const menuRef = useRef(null);
   const notificationsRef = useRef(null);
   const wsRef = useRef(null);
@@ -125,6 +127,29 @@ const Navbar = () => {
     }
   };
 
+  const handleMarkAllNotificationsRead = async () => {
+    const token = localStorage.getItem("auth_token");
+    const storedEmail = localStorage.getItem("useremail");
+    if (!token || unreadCount <= 0) {
+      return;
+    }
+
+    try {
+      await fetch(`${API_BASE_URL}/notifications/read-all`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ email: storedEmail })
+      });
+      setNotifications((prev) => prev.map((row) => ({ ...row, is_read: true })));
+      setUnreadCount(0);
+    } catch {
+      // Silent fail to keep navbar responsive.
+    }
+  };
+
   const triggerBellAnimation = () => {
     setAnimateBell(true);
     if (bellTimeoutRef.current) {
@@ -136,6 +161,15 @@ const Navbar = () => {
   };
 
   const getAvatarSkipKey = (email) => `avatar_onboarding_skipped_${email || "unknown"}`;
+
+  const syncProfileButton = () => {
+    const avatar = localStorage.getItem("user_avatar") || "";
+    const userName = (localStorage.getItem("username") || localStorage.getItem("user_name") || "").trim();
+    const userEmail = (localStorage.getItem("useremail") || "").trim();
+    const initialSource = userName || userEmail || "U";
+    setProfileAvatar(avatar);
+    setProfileInitial(initialSource.charAt(0).toUpperCase());
+  };
 
   const checkAvatarOnboarding = async () => {
     const token = localStorage.getItem("auth_token");
@@ -157,7 +191,12 @@ const Navbar = () => {
 
       const data = await response.json();
       const avatar = data?.user?.avatar || "";
+      const userName = data?.user?.name || "";
       localStorage.setItem("user_avatar", avatar);
+      if (userName) {
+        localStorage.setItem("user_name", userName);
+      }
+      syncProfileButton();
       const wasSkipped = localStorage.getItem(getAvatarSkipKey(storedEmail)) === "1";
       setShowAvatarOnboarding(!avatar && !wasSkipped);
     } catch {
@@ -168,6 +207,7 @@ const Navbar = () => {
   useEffect(() => {
     const token = localStorage.getItem("auth_token");
     setIsLoggedIn(!!token);
+    syncProfileButton();
 
     const handleClickOutside = (event) => {
       if (menuRef.current && !menuRef.current.contains(event.target)) {
@@ -184,6 +224,7 @@ const Navbar = () => {
   useEffect(() => {
     const token = localStorage.getItem("auth_token");
     setIsLoggedIn(!!token);
+    syncProfileButton();
     if (token) {
       checkAvatarOnboarding();
     }
@@ -296,7 +337,10 @@ const Navbar = () => {
     setNotifications([]);
     setUnreadCount(0);
     setShowAvatarOnboarding(false);
+    setProfileAvatar("");
+    setProfileInitial("U");
     localStorage.removeItem("user_avatar");
+    localStorage.removeItem("user_name");
     if (storedEmail) {
       localStorage.removeItem(getAvatarSkipKey(storedEmail));
     }
@@ -361,13 +405,23 @@ const Navbar = () => {
                     <div className="mb-2 flex items-center justify-between px-2">
                       <p className="text-sm font-semibold text-slate-100">Notifications</p>
                       {notifications.length > 0 && (
-                        <button
-                          type="button"
-                          onClick={handleClearNotifications}
-                          className="rounded-full border border-white/15 px-2.5 py-1 text-[11px] font-semibold text-slate-300 transition hover:border-rose-300/40 hover:text-rose-100"
-                        >
-                          Clear
-                        </button>
+                        <div className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={handleMarkAllNotificationsRead}
+                            disabled={unreadCount <= 0}
+                            className="rounded-full border border-white/15 px-2.5 py-1 text-[11px] font-semibold text-slate-300 transition hover:border-rose-300/40 hover:text-rose-100 disabled:opacity-50"
+                          >
+                            Mark read
+                          </button>
+                          <button
+                            type="button"
+                            onClick={handleClearNotifications}
+                            className="rounded-full border border-white/15 px-2.5 py-1 text-[11px] font-semibold text-slate-300 transition hover:border-rose-300/40 hover:text-rose-100"
+                          >
+                            Clear
+                          </button>
+                        </div>
                       )}
                     </div>
                     {notifications.length === 0 ? (
@@ -400,13 +454,22 @@ const Navbar = () => {
               </div>
 
               <div className="relative" ref={menuRef}>
-                <FaUserCircle
-                  className="text-3xl cursor-pointer hover:text-rose-400 transition-all duration-300"
+                <button
+                  type="button"
+                  className="inline-flex h-10 w-10 items-center justify-center overflow-hidden rounded-full border border-white/10 bg-rose-500 text-sm font-bold text-white transition hover:border-rose-300/50 hover:bg-rose-400"
                   onClick={() => {
                     setMenuOpen(!menuOpen);
                     setNotificationsOpen(false);
                   }}
-                />
+                  aria-label="Open profile menu"
+                  title="My profile"
+                >
+                  {profileAvatar ? (
+                    <span className="text-lg leading-none">{profileAvatar}</span>
+                  ) : (
+                    <span>{profileInitial}</span>
+                  )}
+                </button>
                 {menuOpen && (
                   <div className="absolute right-0 mt-3 w-48 bg-black/70 backdrop-blur-md rounded-xl shadow-2xl p-3 transition-all duration-300 transform origin-top scale-100 opacity-100 border border-gray-700">
                     <Link
@@ -445,6 +508,7 @@ const Navbar = () => {
             localStorage.removeItem(getAvatarSkipKey(storedEmail));
           }
           localStorage.setItem("user_avatar", avatarValue);
+          setProfileAvatar(avatarValue);
           setShowAvatarOnboarding(false);
         }}
         onSkip={() => {

@@ -11,6 +11,7 @@ import RegretDetailPage from "./pages/regretDetailPage";
 import GetStarted from "./pages/getStarted";
 import MyProfile from "./pages/myProfile";
 import PrivacyPolicy from "./pages/privacyPolicy";
+import AdminPanel from "./pages/adminPanel";
 import SmoothScroll from "./SmoothScroll";
 import Navbar from "../components/navbar";
 import AuthSuccess from "../components/AuthSuccess";
@@ -112,6 +113,16 @@ function App() {
               <ProtectedRoute>
                 <DefaultLayout>
                   <MyProfile />
+                </DefaultLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/osho"
+            element={
+              <ProtectedRoute>
+                <DefaultLayout>
+                  <AdminPanel />
                 </DefaultLayout>
               </ProtectedRoute>
             }

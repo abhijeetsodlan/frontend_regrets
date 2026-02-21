@@ -162,8 +162,9 @@ const QuestionsPage = () => {
   }, [selectedCategory]);
 
   const handleQuestionCreated = useCallback((question) => {
+    setIsModalOpen(false);
     upsertQuestionInFeed(question);
-    showSuccessToast("Posted a new regret");
+    showSuccessToast("Regret posted");
   }, [showSuccessToast, upsertQuestionInFeed]);
 
   const handleTouchStart = useCallback((event) => {

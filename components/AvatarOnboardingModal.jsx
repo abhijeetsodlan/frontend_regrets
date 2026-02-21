@@ -28,6 +28,7 @@ const AvatarOnboardingModal = ({
   onSaved,
   onSkip,
   showSkip = true,
+  secondaryLabel = "Skip",
   title = "Choose your avatar",
   subtitle = "Pick one avatar to continue. You can keep using it permanently.",
   saveLabel = "Save Avatar"
@@ -107,14 +108,14 @@ const AvatarOnboardingModal = ({
         )}
 
         <div className="mt-5 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-          {showSkip && (
+          {showSkip && onSkip && (
             <button
               type="button"
               onClick={onSkip}
               disabled={saving}
               className="rounded-full border border-white/20 bg-white/5 px-5 py-2 text-sm font-medium text-slate-200 transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-60"
             >
-              Skip
+              {secondaryLabel}
             </button>
           )}
           <button

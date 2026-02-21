@@ -388,10 +388,12 @@ const UserProfile = () => {
       </div>
       <AvatarOnboardingModal
         isOpen={showAvatarModal}
-        showSkip={false}
+        showSkip
+        secondaryLabel="Cancel"
         title="Change your avatar"
         subtitle="Pick a new avatar for your profile."
         saveLabel="Update Avatar"
+        onSkip={() => setShowAvatarModal(false)}
         onSaved={(avatarValue) => {
           localStorage.setItem("user_avatar", avatarValue);
           setUser((prev) => ({ ...prev, avatar: avatarValue }));

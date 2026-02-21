@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { FaCommentDots, FaTimes } from "react-icons/fa";
 
@@ -10,6 +10,9 @@ const FeedbackWidget = ({ showFloating = true, renderTrigger = null }) => {
   const [guestEmail, setGuestEmail] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [status, setStatus] = useState("");
+  const [toastMessage, setToastMessage] = useState("");
+  const [showToast, setShowToast] = useState(false);
+  const toastTimeoutRef = useRef(null);
 
   const token = localStorage.getItem("auth_token");
   const storedEmail = localStorage.getItem("useremail") || "";
@@ -19,6 +22,25 @@ const FeedbackWidget = ({ showFloating = true, renderTrigger = null }) => {
     setIsOpen(false);
     setStatus("");
   };
+
+  const showSuccessToast = (messageText) => {
+    setToastMessage(messageText);
+    setShowToast(true);
+    if (toastTimeoutRef.current) {
+      clearTimeout(toastTimeoutRef.current);
+    }
+    toastTimeoutRef.current = setTimeout(() => {
+      setShowToast(false);
+    }, 2200);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (toastTimeoutRef.current) {
+        clearTimeout(toastTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -44,8 +66,10 @@ const FeedbackWidget = ({ showFloating = true, renderTrigger = null }) => {
         throw new Error("Failed to submit feedback");
       }
 
-      setStatus("Thanks for sharing. We received your feedback.");
       setMessage("");
+      setGuestEmail("");
+      closeModal();
+      showSuccessToast("Feedback submitted");
     } catch {
       setStatus("Could not submit right now. Please try again.");
     } finally {
@@ -144,6 +168,12 @@ const FeedbackWidget = ({ showFloating = true, renderTrigger = null }) => {
           </div>,
           document.body
         )}
+
+      {showToast && (
+        <div className="fixed right-4 top-20 z-[85] rounded-xl border border-emerald-300/30 bg-emerald-500/15 px-4 py-2 text-sm font-medium text-emerald-200 shadow-[0_12px_28px_rgba(16,185,129,0.25)]">
+          {toastMessage}
+        </div>
+      )}
     </>
   );
 };
