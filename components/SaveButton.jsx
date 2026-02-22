@@ -1,15 +1,13 @@
-import React, { useEffect, useState } from "react";
+﻿import React, { useEffect, useState } from "react";
 import { FaBookmark, FaRegBookmark } from "react-icons/fa";
-import axios from "axios";
-
-const API_BASE_URL = "http://localhost:3000/api";
+import { saveQuestion } from "../src/services/questionService";
 
 const SaveButton = ({ questionId, initiallySaved = false, onRequireAuth }) => {
   const [isSaved, setIsSaved] = useState(Boolean(initiallySaved));
   const [loading, setLoading] = useState(false);
 
-  const token = localStorage.getItem("auth_token");
-  const storedEmail = localStorage.getItem("useremail");
+  const token = localStorage.getItem("auth_token") || "";
+  const storedEmail = localStorage.getItem("useremail") || "";
 
   useEffect(() => {
     setIsSaved(Boolean(initiallySaved));
@@ -28,18 +26,9 @@ const SaveButton = ({ questionId, initiallySaved = false, onRequireAuth }) => {
 
     setLoading(true);
     try {
-      const config = {
-        headers: { Authorization: `Bearer ${token}` },
-        params: { email: storedEmail }
-      };
-
-      const response = await axios.post(
-        `${API_BASE_URL}/savepost`,
-        { question_id: questionId },
-        config
-      );
-      if ((response.status === 200 || response.status === 201) && typeof response.data?.saved === "boolean") {
-        setIsSaved(response.data.saved);
+      const data = await saveQuestion(questionId, { token, email: storedEmail });
+      if (typeof data?.saved === "boolean") {
+        setIsSaved(data.saved);
       }
     } catch {
       // Silent fail to avoid interrupting reading flow.

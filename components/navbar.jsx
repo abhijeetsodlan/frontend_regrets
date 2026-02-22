@@ -4,8 +4,14 @@ import { FaBell, FaCommentDots } from "react-icons/fa";
 import LoginModal from "./Login";
 import Logout from "./Logout"; // Import the Logout component
 import FeedbackWidget from "./FeedbackWidget";
-
-const API_BASE_URL = "http://localhost:3000/api";
+import {
+  clearNotifications,
+  getNotifications,
+  markAllNotificationsRead,
+  markNotificationRead
+} from "../src/services/notificationService";
+import { getMe } from "../src/services/userService";
+import { buildWsUrl } from "../src/services/config";
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -36,16 +42,7 @@ const Navbar = () => {
     }
 
     try {
-      const response = await fetch(`${API_BASE_URL}/notifications?email=${encodeURIComponent(storedEmail || "")}`, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
-      if (!response.ok) {
-        return;
-      }
-
-      const data = await response.json();
+      const data = await getNotifications({ token, email: storedEmail || "" });
       setNotifications(data.notifications || []);
       setUnreadCount(data.unread_count || 0);
     } catch {
@@ -81,14 +78,7 @@ const Navbar = () => {
 
     if (token && !notification.is_read) {
       try {
-        await fetch(`${API_BASE_URL}/notifications/${notification.id}/read`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`
-          },
-          body: JSON.stringify({ email: storedEmail })
-        });
+        await markNotificationRead(notification.id, { token, email: storedEmail || "" });
       } catch {
         // Keep navigation even when mark-read fails.
       }
@@ -110,14 +100,7 @@ const Navbar = () => {
     }
 
     try {
-      await fetch(`${API_BASE_URL}/notifications/clear`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify({ email: storedEmail })
-      });
+      await clearNotifications({ token, email: storedEmail || "" });
       setNotifications([]);
       setUnreadCount(0);
     } catch {
@@ -133,14 +116,7 @@ const Navbar = () => {
     }
 
     try {
-      await fetch(`${API_BASE_URL}/notifications/read-all`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify({ email: storedEmail })
-      });
+      await markAllNotificationsRead({ token, email: storedEmail || "" });
       setNotifications((prev) => prev.map((row) => ({ ...row, is_read: true })));
       setUnreadCount(0);
     } catch {
@@ -177,16 +153,7 @@ const Navbar = () => {
     }
 
     try {
-      const response = await fetch(`${API_BASE_URL}/me?email=${encodeURIComponent(storedEmail || "")}`, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
-      if (!response.ok) {
-        return;
-      }
-
-      const data = await response.json();
+      const data = await getMe({ token, email: storedEmail || "" });
       const avatar = data?.user?.avatar || "";
       const userName = data?.user?.name || "";
       localStorage.setItem("user_avatar", avatar);
@@ -228,6 +195,7 @@ const Navbar = () => {
     if (token) {
       checkAvatarOnboarding();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.pathname]);
 
   useEffect(() => {
@@ -261,9 +229,7 @@ const Navbar = () => {
         return;
       }
 
-      const apiUrl = new URL(API_BASE_URL);
-      const wsProtocol = apiUrl.protocol === "https:" ? "wss:" : "ws:";
-      const wsUrl = `${wsProtocol}//${apiUrl.host}/ws?token=${encodeURIComponent(token)}`;
+      const wsUrl = buildWsUrl("/ws", { token });
       const socket = new WebSocket(wsUrl);
       wsRef.current = socket;
 

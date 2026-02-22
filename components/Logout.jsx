@@ -1,6 +1,6 @@
-import React from "react";
+﻿import React from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import { logoutRequest, requestCsrfCookie } from "../src/services/authService";
 
 const Logout = ({ onLogout }) => {
   const navigate = useNavigate();
@@ -15,30 +15,14 @@ const Logout = ({ onLogout }) => {
         return;
       }
 
-      // Fetch CSRF token
-      await axios.get("http://localhost:3000/sanctum/csrf-cookie", {
-        withCredentials: true,
-      });
-
-      // Logout request
-      await axios.post(
-        "http://localhost:3000/api/logout",
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-          withCredentials: true,
-        }
-      );
+      await requestCsrfCookie();
+      await logoutRequest({ token });
 
       localStorage.removeItem("auth_token");
       localStorage.removeItem("useremail");
       navigate("/login");
       if (onLogout) onLogout();
-    } catch (error) {
-      // console.error("Logout failed:", error.response?.data || error.message);
+    } catch {
       localStorage.removeItem("auth_token");
       localStorage.removeItem("useremail");
       navigate("/login");

@@ -1,6 +1,7 @@
-import React, { useEffect } from "react";
+﻿import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { createPortal } from "react-dom";
+import { getGoogleLoginUrl } from "../src/services/authService";
 
 const LoginModal = ({ isOpen, onClose }) => {
   const navigate = useNavigate();
@@ -62,7 +63,7 @@ const LoginModal = ({ isOpen, onClose }) => {
         </div>
 
         <a
-          href="http://localhost:3000/auth/google"
+          href={getGoogleLoginUrl()}
           className="group flex w-full items-center justify-center gap-3 rounded-xl border border-slate-300/60 bg-white px-4 py-3 font-semibold text-slate-900 transition hover:-translate-y-0.5 hover:bg-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-400"
         >
           <img

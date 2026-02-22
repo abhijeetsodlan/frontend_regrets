@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 import { FaUserSecret, FaSyncAlt, FaCrown } from "react-icons/fa";
 import CheckAuthModal from "../../components/CheckAuth";
 import SharePopup from "../../components/SharePopUp";
@@ -10,8 +9,8 @@ import LikeButton from "../../components/LikeButton";
 import CategoriesBar from "../../components/CategoriesBar";
 import AddRegretButton from "../../components/AddRegretButton";
 import SeoMeta from "../../components/SeoMeta";
-
-const API_BASE_URL = "http://localhost:3000/api";
+import { getCategories, getQuestions, likeQuestion } from "../services/questionService";
+import { buildWsUrl } from "../services/config";
 
 const QuestionsPage = () => {
   const [questions, setQuestions] = useState([]);
@@ -34,36 +33,26 @@ const QuestionsPage = () => {
   const token = localStorage.getItem("auth_token");
   const storedEmail = localStorage.getItem("useremail");
 
-  const getApiConfig = useCallback(
-    () => ({
-      headers: { Authorization: `Bearer ${token}` },
-      params: { email: storedEmail }
-    }),
-    [token, storedEmail]
-  );
-
   useEffect(() => {
-    axios
-      .get(`${API_BASE_URL}/categories`, getApiConfig())
-      .then((response) => setCategories(response.data.data || []))
+    getCategories({ token: token || "", email: storedEmail || "" })
+      .then((data) => setCategories(data.data || []))
       .catch(() => setCategories([]));
-  }, [getApiConfig]);
+  }, [token, storedEmail]);
 
   const loadQuestions = useCallback(async ({ showPageLoader = true } = {}) => {
-    const apiUrl =
-      selectedCategory === "All"
-        ? `${API_BASE_URL}/questions`
-        : `${API_BASE_URL}/questions/category/${selectedCategory}`;
-
     if (showPageLoader) {
       setLoading(true);
     }
     try {
-      const response = await axios.get(apiUrl, getApiConfig());
-      const fetchedQuestions = response.data.questions || [];
+      const data = await getQuestions({
+        category: selectedCategory,
+        token: token || "",
+        email: storedEmail || ""
+      });
+      const fetchedQuestions = data.questions || [];
       setQuestions(fetchedQuestions);
       if (selectedCategory === "All") {
-        setTopRegretOfDay(response.data.top_regret_of_day || null);
+        setTopRegretOfDay(data.top_regret_of_day || null);
       } else {
         setTopRegretOfDay(null);
       }
@@ -86,7 +75,7 @@ const QuestionsPage = () => {
         setLoading(false);
       }
     }
-  }, [selectedCategory, getApiConfig]);
+  }, [selectedCategory, token, storedEmail]);
 
   useEffect(() => {
     loadQuestions();
@@ -117,12 +106,12 @@ const QuestionsPage = () => {
       }));
 
       try {
-        await axios.post(`${API_BASE_URL}/questions/${questionId}/like`, {}, getApiConfig());
-      } catch (_err) {
+        await likeQuestion(questionId, { token: token || "", email: storedEmail || "" });
+      } catch {
         // Keep optimistic UI for a smoother feel.
       }
     },
-    [getApiConfig, token]
+    [token, storedEmail]
   );
 
   const handleAddRegret = () => {
@@ -234,9 +223,7 @@ const QuestionsPage = () => {
       if (cancelled) {
         return;
       }
-      const apiUrl = new URL(API_BASE_URL);
-      const wsProtocol = apiUrl.protocol === "https:" ? "wss:" : "ws:";
-      const wsUrl = `${wsProtocol}//${apiUrl.host}/ws?token=${encodeURIComponent(token)}`;
+      const wsUrl = buildWsUrl("/ws", { token });
       const socket = new WebSocket(wsUrl);
       wsRef.current = socket;
 

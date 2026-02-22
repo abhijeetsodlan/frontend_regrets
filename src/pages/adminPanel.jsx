@@ -13,8 +13,18 @@ import {
   FaTimes
 } from "react-icons/fa";
 import SeoMeta from "../../components/SeoMeta";
-
-const API_BASE_URL = "http://localhost:3000/api";
+import {
+  adminCreateStoryType,
+  adminDeleteQuestion,
+  adminDeleteUser,
+  adminGetFeedbacks,
+  adminGetQuestionReplies,
+  adminGetQuestions,
+  adminGetStoryTypes,
+  adminGetUserPosts,
+  adminGetUsers,
+  adminSendNotification
+} from "../services/adminService";
 const ADMIN_EMAIL = "abhijeetsodlan7@gmail.com";
 const PAGE_SIZE = 10;
 
@@ -66,62 +76,58 @@ const AdminPanel = () => {
   const [creatingStoryType, setCreatingStoryType] = useState(false);
   const [actionMessage, setActionMessage] = useState("");
 
-  const authHeaders = useMemo(
-    () => ({
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`
-    }),
-    [token]
-  );
+  const authToken = useMemo(() => token || "", [token]);
 
   const fetchUsers = async () => {
-    const response = await fetch(
-      `${API_BASE_URL}/admin/users?search=${encodeURIComponent(userSearch)}&email=${encodeURIComponent(storedEmail)}&page=${usersPage}&limit=${PAGE_SIZE}`,
-      { headers: authHeaders }
-    );
-    if (!response.ok) throw new Error("Failed to load users");
-    const data = await response.json();
+    const data = await adminGetUsers({
+      search: userSearch,
+      email: storedEmail,
+      page: usersPage,
+      limit: PAGE_SIZE,
+      token: authToken
+    });
     setUserStats(data.stats || { total_users: 0, joined_today: 0 });
     setUsers(data.users || []);
     setUsersPagination(data.pagination || { page: usersPage, limit: PAGE_SIZE, total: 0, total_pages: 1 });
   };
 
   const fetchQuestions = async () => {
-    const response = await fetch(
-      `${API_BASE_URL}/admin/questions?search=${encodeURIComponent(questionSearch)}&email=${encodeURIComponent(storedEmail)}&page=${questionsPage}&limit=${PAGE_SIZE}`,
-      { headers: authHeaders }
-    );
-    if (!response.ok) throw new Error("Failed to load regrets");
-    const data = await response.json();
+    const data = await adminGetQuestions({
+      search: questionSearch,
+      email: storedEmail,
+      page: questionsPage,
+      limit: PAGE_SIZE,
+      token: authToken
+    });
     setQuestions(data.questions || []);
     setQuestionsPagination(data.pagination || { page: questionsPage, limit: PAGE_SIZE, total: 0, total_pages: 1 });
   };
 
   const fetchFeedbacks = async () => {
-    const response = await fetch(
-      `${API_BASE_URL}/admin/feedbacks?search=${encodeURIComponent(feedbackSearch)}&email=${encodeURIComponent(storedEmail)}&page=${feedbackPage}&limit=${PAGE_SIZE}`,
-      { headers: authHeaders }
-    );
-    if (!response.ok) throw new Error("Failed to load feedbacks");
-    const data = await response.json();
+    const data = await adminGetFeedbacks({
+      search: feedbackSearch,
+      email: storedEmail,
+      page: feedbackPage,
+      limit: PAGE_SIZE,
+      token: authToken
+    });
     setFeedbacks(data.feedbacks || []);
     setFeedbackPagination(data.pagination || { page: feedbackPage, limit: PAGE_SIZE, total: 0, total_pages: 1 });
   };
 
   const fetchRecipientUsers = async () => {
-    const response = await fetch(
-      `${API_BASE_URL}/admin/users?search=${encodeURIComponent(recipientSearch)}&email=${encodeURIComponent(storedEmail)}&page=1&limit=50`,
-      { headers: authHeaders }
-    );
-    if (!response.ok) throw new Error("Failed to load recipients");
-    const data = await response.json();
+    const data = await adminGetUsers({
+      search: recipientSearch,
+      email: storedEmail,
+      page: 1,
+      limit: 50,
+      token: authToken
+    });
     setRecipientUsers(data.users || []);
   };
 
   const fetchStoryTypes = async () => {
-    const response = await fetch(`${API_BASE_URL}/categories`, { headers: authHeaders });
-    if (!response.ok) throw new Error("Failed to load story types");
-    const data = await response.json();
+    const data = await adminGetStoryTypes({ token: authToken });
     setStoryTypes(data.data || []);
   };
 
@@ -176,12 +182,7 @@ const AdminPanel = () => {
 
   const handleDeleteQuestion = async (id) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/admin/questions/${id}`, {
-        method: "DELETE",
-        headers: authHeaders,
-        body: JSON.stringify({ email: storedEmail })
-      });
-      if (!response.ok) throw new Error("Failed to delete regret");
+      await adminDeleteQuestion({ id, email: storedEmail, token: authToken });
       setQuestions((prev) => prev.filter((row) => row.id !== id));
       setActionMessage("Regret deleted");
     } catch (err) {
@@ -191,12 +192,7 @@ const AdminPanel = () => {
 
   const handleDeleteUser = async (id) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/admin/users/${id}`, {
-        method: "DELETE",
-        headers: authHeaders,
-        body: JSON.stringify({ email: storedEmail })
-      });
-      if (!response.ok) throw new Error("Failed to delete user");
+      await adminDeleteUser({ id, email: storedEmail, token: authToken });
       setUsers((prev) => prev.filter((row) => row.id !== id));
       setActionMessage("User deleted");
       setSelectedUserPosts(null);
@@ -207,12 +203,7 @@ const AdminPanel = () => {
 
   const openUserPosts = async (userId) => {
     try {
-      const response = await fetch(
-        `${API_BASE_URL}/admin/users/${userId}/posts?email=${encodeURIComponent(storedEmail)}`,
-        { headers: authHeaders }
-      );
-      if (!response.ok) throw new Error("Failed to load user posts");
-      const data = await response.json();
+      const data = await adminGetUserPosts({ userId, email: storedEmail, token: authToken });
       setSelectedUserPosts(data);
     } catch (err) {
       setActionMessage(err.message || "Action failed");
@@ -221,12 +212,7 @@ const AdminPanel = () => {
 
   const openRegretReplies = async (questionId) => {
     try {
-      const response = await fetch(
-        `${API_BASE_URL}/admin/questions/${questionId}/replies?email=${encodeURIComponent(storedEmail)}`,
-        { headers: authHeaders }
-      );
-      if (!response.ok) throw new Error("Failed to load regret replies");
-      const data = await response.json();
+      const data = await adminGetQuestionReplies({ questionId, email: storedEmail, token: authToken });
       setSelectedQuestionReplies(data);
     } catch (err) {
       setActionMessage(err.message || "Action failed");
@@ -240,18 +226,13 @@ const AdminPanel = () => {
     setSendingNotification(true);
     setActionMessage("");
     try {
-      const body = {
+      const data = await adminSendNotification({
         message: notifyMessage.trim(),
-        send_to_all: notifyTarget === "all",
-        user_ids: notifyTarget === "selected" ? notifyUserIds : []
-      };
-      const response = await fetch(`${API_BASE_URL}/admin/notify`, {
-        method: "POST",
-        headers: authHeaders,
-        body: JSON.stringify({ ...body, email: storedEmail })
+        sendToAll: notifyTarget === "all",
+        userIds: notifyTarget === "selected" ? notifyUserIds : [],
+        email: storedEmail,
+        token: authToken
       });
-      if (!response.ok) throw new Error("Failed to send notification");
-      const data = await response.json();
       setActionMessage(`Notification sent (${data.sent_count || 0})`);
       setNotifyMessage("");
       setNotifyUserIds([]);
@@ -269,16 +250,11 @@ const AdminPanel = () => {
     setCreatingStoryType(true);
     setActionMessage("");
     try {
-      const response = await fetch(`${API_BASE_URL}/categories`, {
-        method: "POST",
-        headers: authHeaders,
-        body: JSON.stringify({ name: newStoryTypeName.trim(), email: storedEmail })
+      const data = await adminCreateStoryType({
+        name: newStoryTypeName.trim(),
+        email: storedEmail,
+        token: authToken
       });
-      if (!response.ok) {
-        const data = await response.json().catch(() => ({}));
-        throw new Error(data.message || "Failed to create story type");
-      }
-      const data = await response.json();
       setStoryTypes((prev) => {
         const next = [...prev, data.category].filter(Boolean);
         return next.sort((a, b) => String(a.name).localeCompare(String(b.name)));

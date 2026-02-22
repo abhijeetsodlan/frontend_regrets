@@ -3,8 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { FaArrowLeft, FaRegBookmark, FaRegFileAlt, FaAt, FaEdit, FaUserEdit } from "react-icons/fa";
 import SeoMeta from "../../components/SeoMeta";
 import AvatarOnboardingModal from "../../components/AvatarOnboardingModal";
-
-const API_BASE_URL = "http://localhost:3000/api";
+import { getMyProfile, updateMe } from "../services/userService";
+import { updateQuestion } from "../services/questionService";
 
 const UserProfile = () => {
   const [activeTab, setActiveTab] = useState("uploaded");
@@ -34,20 +34,7 @@ const UserProfile = () => {
           throw new Error("User not authenticated");
         }
 
-        const response = await fetch(`${API_BASE_URL}/myprofile`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${authToken}`
-          },
-          body: JSON.stringify({ email: userEmail })
-        });
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch profile data");
-        }
-
-        const data = await response.json();
+        const data = await getMyProfile({ token: authToken, email: userEmail });
         setUser({
           name: data.data.name || "",
           email: data.data.email || "",
@@ -86,20 +73,7 @@ const UserProfile = () => {
     setSavingProfile(true);
     setProfileMessage("");
     try {
-      const response = await fetch(`${API_BASE_URL}/me`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${authToken}`
-        },
-        body: JSON.stringify({ name: trimmedName, email: userEmail })
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to update profile");
-      }
-
-      const data = await response.json();
+      const data = await updateMe({ name: trimmedName, token: authToken, email: userEmail || "" });
       const updatedName = data?.user?.name || trimmedName;
       setUser((prev) => ({ ...prev, name: updatedName }));
       localStorage.setItem("user_name", updatedName);
@@ -133,18 +107,7 @@ const UserProfile = () => {
 
     setSavingEdit(true);
     try {
-      const response = await fetch(`${API_BASE_URL}/questions/${postId}`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${authToken}`
-        },
-        body: JSON.stringify({ title: trimmedTitle, email: userEmail })
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to update regret");
-      }
+      await updateQuestion(postId, { title: trimmedTitle, token: authToken, email: userEmail || "" });
 
       setUploadedPosts((prev) =>
         prev.map((post) => (post.id === postId ? { ...post, title: trimmedTitle } : post))

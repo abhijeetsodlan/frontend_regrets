@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+﻿import React, { useState, useEffect } from "react";
 import {
   FaWhatsapp,
   FaInstagram,
@@ -7,8 +7,7 @@ import {
   FaTimes,
   FaShareAlt
 } from "react-icons/fa";
-
-const API_BASE_URL = "http://localhost:3000/api";
+import { shareQuestion } from "../src/services/questionService";
 
 const SharePopup = ({ regretId, regretTitle }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -18,16 +17,10 @@ const SharePopup = ({ regretId, regretTitle }) => {
 
   const trackShare = async () => {
     if (!regretId) return;
-    const token = localStorage.getItem("auth_token");
-    const storedEmail = localStorage.getItem("useremail");
+    const token = localStorage.getItem("auth_token") || "";
+    const storedEmail = localStorage.getItem("useremail") || "";
     try {
-      await fetch(`${API_BASE_URL}/questions/${regretId}/share${storedEmail ? `?email=${encodeURIComponent(storedEmail)}` : ""}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          ...(token ? { Authorization: `Bearer ${token}` } : {})
-        }
-      });
+      await shareQuestion(regretId, { token, email: storedEmail });
     } catch {
       // no-op
     }
@@ -44,7 +37,7 @@ const SharePopup = ({ regretId, regretTitle }) => {
       await navigator.clipboard.writeText(shareUrl);
       trackShare();
       setIsOpen(false);
-    } catch (_err) {
+    } catch {
       // Ignore clipboard errors silently.
     }
   };
@@ -55,7 +48,7 @@ const SharePopup = ({ regretId, regretTitle }) => {
       try {
         await navigator.share({ title: regretTitle, text: shareText, url: shareUrl });
         trackShare();
-      } catch (_error) {
+      } catch {
         // no-op
       }
       return;

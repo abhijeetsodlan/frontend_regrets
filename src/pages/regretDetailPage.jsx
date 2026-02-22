@@ -1,11 +1,10 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import axios from "axios";
 import { FaHeartBroken, FaArrowLeft, FaPaperPlane, FaUserSecret } from "react-icons/fa";
 import SharePopup from "../../components/SharePopUp";
 import SeoMeta from "../../components/SeoMeta";
-
-const API_BASE_URL = "http://localhost:3000/api";
+import { createComment, getCommentsByQuestion } from "../services/commentService";
+import { getQuestionDetails, likeQuestion } from "../services/questionService";
 
 const RegretDetailPage = () => {
   const { regret_id } = useParams();
@@ -23,29 +22,20 @@ const RegretDetailPage = () => {
   const token = localStorage.getItem("auth_token");
   const storedEmail = localStorage.getItem("useremail");
 
-  const getAuthHeader = () => ({
-    headers: { Authorization: `Bearer ${token}` }
-  });
-
-  const getAuthHeaderWithEmail = () => ({
-    headers: { Authorization: `Bearer ${token}` },
-    params: { email: storedEmail }
-  });
-
   const sortCommentsNewestFirst = (items = []) =>
     [...items].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 
   const loadData = async () => {
     try {
       const [questionRes, commentsRes] = await Promise.all([
-        axios.get(`${API_BASE_URL}/questions/${regret_id}`, getAuthHeaderWithEmail()),
-        axios.get(`${API_BASE_URL}/comments/${regret_id}`, getAuthHeaderWithEmail())
+        getQuestionDetails(regret_id, { token: token || "", email: storedEmail || "" }),
+        getCommentsByQuestion(regret_id, { token: token || "", email: storedEmail || "" })
       ]);
 
-      setRegret(questionRes.data.question || null);
-      setComments(sortCommentsNewestFirst(commentsRes.data.comments || []));
+      setRegret(questionRes.question || null);
+      setComments(sortCommentsNewestFirst(commentsRes.comments || []));
       setError(null);
-    } catch (_err) {
+    } catch {
       setError("Failed to load regret details.");
     } finally {
       setLoading(false);
@@ -88,8 +78,8 @@ const RegretDetailPage = () => {
     }));
 
     try {
-      await axios.post(`${API_BASE_URL}/questions/${regret_id}/like`, {}, getAuthHeader());
-    } catch (_error) {
+      await likeQuestion(regret_id, { token: token || "", email: storedEmail || "" });
+    } catch {
       setRegret((prev) => ({
         ...prev,
         liked_by_user: !newLikedStatus,
@@ -104,21 +94,18 @@ const RegretDetailPage = () => {
 
     setSubmittingReply(true);
     try {
-      await axios.post(
-        `${API_BASE_URL}/comment`,
-        {
-          title: replyText.trim(),
-          question_id: regret_id,
-          is_anonymous: isAnonymousReply ? 1 : 0,
-          email: storedEmail
-        },
-        getAuthHeader()
-      );
+      await createComment({
+        title: replyText.trim(),
+        questionId: regret_id,
+        isAnonymous: isAnonymousReply,
+        token: token || "",
+        email: storedEmail || ""
+      });
 
       setReplyText("");
-      const res = await axios.get(`${API_BASE_URL}/comments/${regret_id}`, getAuthHeaderWithEmail());
-      setComments(sortCommentsNewestFirst(res.data.comments || []));
-    } catch (_error) {
+      const data = await getCommentsByQuestion(regret_id, { token: token || "", email: storedEmail || "" });
+      setComments(sortCommentsNewestFirst(data.comments || []));
+    } catch {
       // keep quiet to avoid interrupting flow
     } finally {
       setSubmittingReply(false);

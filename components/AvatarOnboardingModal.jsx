@@ -1,6 +1,5 @@
-import React, { useState } from "react";
-
-const API_BASE_URL = "http://localhost:3000/api";
+﻿import React, { useState } from "react";
+import { updateAvatar } from "../src/services/userService";
 
 const AVATAR_OPTIONS = [
   { value: "\u{1F468}", label: "Boy 1" },
@@ -52,18 +51,11 @@ const AvatarOnboardingModal = ({
     setSaving(true);
     setError("");
     try {
-      const response = await fetch(`${API_BASE_URL}/me/avatar`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify({ avatar: selected, email: storedEmail })
+      await updateAvatar({
+        avatar: selected,
+        token,
+        email: storedEmail || ""
       });
-
-      if (!response.ok) {
-        throw new Error("Failed to save avatar");
-      }
 
       localStorage.setItem("user_avatar", selected);
       if (onSaved) {
