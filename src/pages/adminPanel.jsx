@@ -10,7 +10,8 @@ import {
   FaInbox,
   FaTags,
   FaBars,
-  FaTimes
+  FaTimes,
+  FaMoon
 } from "react-icons/fa";
 import SeoMeta from "../../components/SeoMeta";
 import {
@@ -23,6 +24,10 @@ import {
   adminGetStoryTypes,
   adminGetUserPosts,
   adminGetUsers,
+  adminGetNightRoomPosts,
+  adminGetNightRoomReplies,
+  adminGetNightRoomSettings,
+  adminUpdateNightRoomSettings,
   adminSendNotification
 } from "../services/adminService";
 const ADMIN_EMAIL = "abhijeetsodlan7@gmail.com";
@@ -74,6 +79,13 @@ const AdminPanel = () => {
   const [sendingNotification, setSendingNotification] = useState(false);
   const [newStoryTypeName, setNewStoryTypeName] = useState("");
   const [creatingStoryType, setCreatingStoryType] = useState(false);
+  const [nightRoomPosts, setNightRoomPosts] = useState([]);
+  const [nightRoomPagination, setNightRoomPagination] = useState({ page: 1, limit: PAGE_SIZE, total: 0, total_pages: 1 });
+  const [nightRoomSearch, setNightRoomSearch] = useState("");
+  const [nightRoomPage, setNightRoomPage] = useState(1);
+  const [nightRoomSetting, setNightRoomSetting] = useState({ mode: "auto", is_open: false });
+  const [updatingNightRoomMode, setUpdatingNightRoomMode] = useState(false);
+  const [selectedNightRoomReplies, setSelectedNightRoomReplies] = useState(null);
   const [actionMessage, setActionMessage] = useState("");
 
   const authToken = useMemo(() => token || "", [token]);
@@ -131,6 +143,25 @@ const AdminPanel = () => {
     setStoryTypes(data.data || []);
   };
 
+  const fetchNightRoomPosts = async () => {
+    const data = await adminGetNightRoomPosts({
+      search: nightRoomSearch,
+      page: nightRoomPage,
+      limit: PAGE_SIZE,
+      token: authToken
+    });
+    setNightRoomPosts(data.posts || []);
+    setNightRoomPagination(data.pagination || { page: nightRoomPage, limit: PAGE_SIZE, total: 0, total_pages: 1 });
+  };
+
+  const fetchNightRoomSetting = async () => {
+    const data = await adminGetNightRoomSettings({ token: authToken });
+    setNightRoomSetting({
+      mode: data.mode || "auto",
+      is_open: Boolean(data.is_open)
+    });
+  };
+
   const loadAll = async () => {
     setLoading(true);
     setError("");
@@ -166,6 +197,13 @@ const AdminPanel = () => {
     fetchStoryTypes().catch((err) => setError(err.message || "Failed to load story types"));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [canAccess, activePage]);
+
+  useEffect(() => {
+    if (!canAccess || activePage !== "night-room") return;
+    fetchNightRoomPosts().catch((err) => setError(err.message || "Failed to load 9-4 room posts"));
+    fetchNightRoomSetting().catch((err) => setError(err.message || "Failed to load 9-4 room settings"));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [canAccess, activePage, nightRoomSearch, nightRoomPage]);
 
   useEffect(() => {
     setIsMobileSidebarOpen(false);
@@ -265,6 +303,33 @@ const AdminPanel = () => {
       setActionMessage(err.message || "Failed to create story type");
     } finally {
       setCreatingStoryType(false);
+    }
+  };
+
+  const handleNightRoomModeChange = async (mode) => {
+    if (updatingNightRoomMode) return;
+    setUpdatingNightRoomMode(true);
+    setActionMessage("");
+    try {
+      const data = await adminUpdateNightRoomSettings({ mode, token: authToken });
+      setNightRoomSetting({
+        mode: data.mode || mode,
+        is_open: Boolean(data.is_open)
+      });
+      setActionMessage(`9-4 Room mode updated to ${mode}`);
+    } catch (err) {
+      setActionMessage(err.message || "Failed to update 9-4 Room mode");
+    } finally {
+      setUpdatingNightRoomMode(false);
+    }
+  };
+
+  const openNightRoomReplies = async (postId) => {
+    try {
+      const data = await adminGetNightRoomReplies({ postId, token: authToken });
+      setSelectedNightRoomReplies(data);
+    } catch (err) {
+      setActionMessage(err.message || "Failed to load 9-4 Room replies");
     }
   };
 
@@ -386,6 +451,16 @@ const AdminPanel = () => {
           >
             <FaTags size={13} />
             Story Types
+          </button>
+          <button
+            type="button"
+            onClick={() => setActivePage("night-room")}
+            className={`mt-2 inline-flex w-full items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium transition ${
+              activePage === "night-room" ? "bg-rose-500/20 text-rose-100" : "text-slate-300 hover:bg-white/5"
+            }`}
+          >
+            <FaMoon size={13} />
+            9-4 Room
           </button>
         </aside>
 
@@ -533,6 +608,111 @@ const AdminPanel = () => {
               </article>
             ))}
           </div>
+        </section>
+        )}
+
+        {activePage === "night-room" && (
+        <section className="rounded-2xl border border-white/10 bg-slate-900/60 p-5">
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+            <h2 className="text-lg font-semibold text-slate-100">9-4 Room ({nightRoomPosts.length})</h2>
+            <label className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-slate-950/70 px-3 py-2 text-xs text-slate-300">
+              <FaSearch size={11} />
+              <input
+                value={nightRoomSearch}
+                onChange={(e) => {
+                  setNightRoomPage(1);
+                  setNightRoomSearch(e.target.value);
+                }}
+                placeholder="Search 9-4 posts"
+                className="bg-transparent outline-none"
+              />
+            </label>
+          </div>
+
+          <div className="mb-4 rounded-xl border border-white/10 bg-slate-950/50 p-3">
+            <p className="mb-2 text-xs text-slate-300">Current mode: <span className="font-semibold text-slate-100">{nightRoomSetting.mode}</span> | Open now: <span className="font-semibold text-slate-100">{nightRoomSetting.is_open ? "Yes" : "No"}</span></p>
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={() => handleNightRoomModeChange("auto")}
+                disabled={updatingNightRoomMode}
+                className="rounded-full border border-white/20 bg-white/5 px-3 py-1 text-xs text-slate-200"
+              >
+                Auto (9PM-4AM)
+              </button>
+              <button
+                type="button"
+                onClick={() => handleNightRoomModeChange("force_on")}
+                disabled={updatingNightRoomMode}
+                className="rounded-full border border-emerald-300/30 bg-emerald-500/10 px-3 py-1 text-xs text-emerald-200"
+              >
+                Force ON
+              </button>
+              <button
+                type="button"
+                onClick={() => handleNightRoomModeChange("force_off")}
+                disabled={updatingNightRoomMode}
+                className="rounded-full border border-rose-300/30 bg-rose-500/10 px-3 py-1 text-xs text-rose-200"
+              >
+                Force OFF
+              </button>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            {nightRoomPosts.map((post) => (
+              <article key={post.id} className="rounded-xl border border-white/10 bg-slate-950/50 p-3">
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div className="space-y-1">
+                    <p className="text-sm text-slate-100">{post.title}</p>
+                    <p className="text-xs text-slate-400">
+                      Posted by: {post.is_anonymous ? "Anonymous" : post.user?.name || "Unknown"} ({post.user?.email || "N/A"}) | {formatDateTime(post.created_at)}
+                    </p>
+                    <p className="text-xs text-slate-500">
+                      Likes: {post.likes_count || 0} | Replies: {post.replies_count || 0}
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => openNightRoomReplies(post.id)}
+                    className="inline-flex items-center gap-1 rounded-full border border-white/15 bg-white/5 px-3 py-1 text-xs font-semibold text-slate-200 transition hover:bg-white/10"
+                  >
+                    Replies
+                  </button>
+                </div>
+              </article>
+            ))}
+          </div>
+
+          <PaginationControls pagination={nightRoomPagination} onChangePage={setNightRoomPage} />
+
+          {selectedNightRoomReplies && (
+            <div className="mt-4 rounded-xl border border-white/10 bg-slate-950/55 p-3">
+              <div className="mb-2 flex items-center justify-between">
+                <p className="text-sm font-semibold text-slate-100">
+                  Replies for: {selectedNightRoomReplies.post?.title}
+                </p>
+                <button
+                  type="button"
+                  onClick={() => setSelectedNightRoomReplies(null)}
+                  className="text-xs text-slate-400 hover:text-slate-200"
+                >
+                  Close
+                </button>
+              </div>
+              <div className="space-y-2">
+                {(selectedNightRoomReplies.replies || []).map((reply) => (
+                  <div key={reply.id} className="rounded-lg border border-white/10 bg-slate-900/45 px-3 py-2 text-xs text-slate-300">
+                    <p className="text-sm text-slate-100">{reply.title}</p>
+                    <p className="mt-1">
+                      {reply.is_anonymous ? "Anonymous" : `${reply.user?.name || "Unknown"} (${reply.user?.email || "N/A"})`}
+                    </p>
+                    <p className="mt-1">{formatDateTime(reply.created_at)}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </section>
         )}
 

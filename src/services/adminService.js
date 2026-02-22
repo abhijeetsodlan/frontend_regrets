@@ -89,3 +89,33 @@ export const adminGetStoryTypes = async ({ token = "" } = {}) => {
   const response = await apiClient.get("/categories", buildAuthConfig({ token }));
   return response.data;
 };
+
+export const adminGetNightRoomPosts = async ({ search = "", page = 1, limit = 10, token = "" } = {}) => {
+  const response = await apiClient.get(
+    "/admin/night-room/posts",
+    buildAuthConfig({ token, params: { search, page, limit } })
+  );
+  return response.data;
+};
+
+export const adminGetNightRoomReplies = async ({ postId, token = "" } = {}) => {
+  const response = await apiClient.get(
+    `/admin/night-room/posts/${postId}/replies`,
+    buildAuthConfig({ token })
+  );
+  return response.data;
+};
+
+export const adminGetNightRoomSettings = async ({ token = "" } = {}) => {
+  const response = await apiClient.get("/admin/night-room/settings", buildAuthConfig({ token }));
+  return response.data;
+};
+
+export const adminUpdateNightRoomSettings = async ({ mode, token = "" } = {}) => {
+  const response = await apiClient.patch(
+    "/admin/night-room/settings",
+    { mode },
+    buildAuthConfig({ token, headers: { "Content-Type": "application/json" } })
+  );
+  return response.data;
+};

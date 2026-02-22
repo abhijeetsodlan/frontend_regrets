@@ -11,6 +11,8 @@ import AddRegretButton from "../../components/AddRegretButton";
 import SeoMeta from "../../components/SeoMeta";
 import { getCategories, getQuestions, likeQuestion } from "../services/questionService";
 import { buildWsUrl } from "../services/config";
+import { Link } from "react-router-dom";
+import { getNightRoomStatus } from "../services/nightRoomService";
 
 const QuestionsPage = () => {
   const [questions, setQuestions] = useState([]);
@@ -22,6 +24,7 @@ const QuestionsPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
   const [showToast, setShowToast] = useState(false);
+  const [isNightRoomOpen, setIsNightRoomOpen] = useState(false);
   const [pullDistance, setPullDistance] = useState(0);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const wsRef = useRef(null);
@@ -38,6 +41,21 @@ const QuestionsPage = () => {
       .then((data) => setCategories(data.data || []))
       .catch(() => setCategories([]));
   }, [token, storedEmail]);
+
+  useEffect(() => {
+    const refreshNightRoomStatus = async () => {
+      try {
+        const data = await getNightRoomStatus();
+        setIsNightRoomOpen(Boolean(data.is_open));
+      } catch {
+        setIsNightRoomOpen(false);
+      }
+    };
+
+    refreshNightRoomStatus();
+    const intervalRef = setInterval(refreshNightRoomStatus, 60000);
+    return () => clearInterval(intervalRef);
+  }, []);
 
   const loadQuestions = useCallback(async ({ showPageLoader = true } = {}) => {
     if (showPageLoader) {
@@ -321,6 +339,15 @@ const QuestionsPage = () => {
         <div className="mb-4 hidden justify-end sm:flex">
           <AddRegretButton onClick={handleAddRegret} />
         </div>
+
+        {isNightRoomOpen && (
+          <Link
+            to="/9-4-room"
+            className="mb-4 block rounded-2xl border border-cyan-300/30 bg-cyan-500/10 px-4 py-3 text-sm text-cyan-100 transition hover:bg-cyan-500/20"
+          >
+            🌙 The 9–4 Room is open.
+          </Link>
+        )}
 
         <CategoriesBar
           categories={categories}

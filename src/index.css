@@ -25,3 +25,135 @@ html.lenis body {
 .scrollbar-hide {
   scrollbar-width: none;
 }
+
+.night-room-bg {
+  background: linear-gradient(130deg, #03040b, #090d1e, #120c1d, #05060f);
+  background-size: 300% 300%;
+  animation: nightRoomGradient 45s ease-in-out infinite;
+}
+
+@keyframes nightRoomGradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.night-room-enter {
+  animation: nightRoomEnterFade 0.62s ease forwards;
+}
+
+.night-room-enter-bg {
+  background: radial-gradient(circle at 20% 20%, rgba(8, 23, 46, 0.78), transparent 55%),
+    radial-gradient(circle at 78% 28%, rgba(44, 15, 70, 0.72), transparent 54%),
+    linear-gradient(145deg, #03040b 0%, #060b19 40%, #130a1f 72%, #04060f 100%);
+  animation: nightRoomEnterDrift 1.8s ease-in-out forwards;
+}
+
+.night-room-enter-orb-a {
+  background: radial-gradient(circle, rgba(41, 167, 255, 0.34) 0%, rgba(41, 167, 255, 0) 72%);
+  filter: blur(10px);
+  animation: nightRoomEnterOrbA 0.95s ease-out forwards;
+}
+
+.night-room-enter-orb-b {
+  background: radial-gradient(circle, rgba(188, 86, 255, 0.3) 0%, rgba(188, 86, 255, 0) 70%);
+  filter: blur(12px);
+  animation: nightRoomEnterOrbB 0.95s ease-out forwards;
+}
+
+.night-room-enter-orb-c {
+  background: radial-gradient(circle, rgba(82, 240, 221, 0.2) 0%, rgba(82, 240, 221, 0) 72%);
+  filter: blur(12px);
+  animation: nightRoomEnterOrbC 0.95s ease-out forwards;
+}
+
+.night-room-enter-sweep {
+  background: linear-gradient(
+    115deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(153, 238, 255, 0.18) 46%,
+    rgba(255, 255, 255, 0) 68%
+  );
+  transform: translateX(-120%) skewX(-12deg);
+  animation: nightRoomEnterSweep 0.85s ease-out forwards;
+}
+
+.night-room-enter-vignette {
+  background: radial-gradient(circle at center, rgba(0, 0, 0, 0) 38%, rgba(0, 0, 0, 0.56) 100%);
+}
+
+@keyframes nightRoomEnterFade {
+  0% {
+    opacity: 0;
+  }
+  16% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes nightRoomEnterDrift {
+  0% {
+    transform: scale(1.08);
+    filter: saturate(1.25);
+  }
+  100% {
+    transform: scale(1);
+    filter: saturate(1);
+  }
+}
+
+@keyframes nightRoomEnterSweep {
+  0% {
+    transform: translateX(-120%) skewX(-12deg);
+    opacity: 0.2;
+  }
+  55% {
+    opacity: 0.95;
+  }
+  100% {
+    transform: translateX(125%) skewX(-12deg);
+    opacity: 0;
+  }
+}
+
+@keyframes nightRoomEnterOrbA {
+  0% {
+    transform: translate(-55px, 28px) scale(0.86);
+    opacity: 0;
+  }
+  100% {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes nightRoomEnterOrbB {
+  0% {
+    transform: translate(60px, -20px) scale(0.88);
+    opacity: 0;
+  }
+  100% {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes nightRoomEnterOrbC {
+  0% {
+    transform: translate(-50%, 48px) scale(0.84);
+    opacity: 0;
+  }
+  100% {
+    transform: translate(-50%, 0) scale(1);
+    opacity: 1;
+  }
+}
