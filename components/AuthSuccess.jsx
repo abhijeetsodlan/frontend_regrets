@@ -9,7 +9,6 @@ const AuthSuccess = () => {
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
     const token = queryParams.get("token");
-    const name = queryParams.get("name");
     const email = queryParams.get("email");
 
     if (token) {

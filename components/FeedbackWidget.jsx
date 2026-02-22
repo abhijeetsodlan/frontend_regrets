@@ -1,8 +1,7 @@
-import React, { useEffect, useRef, useState } from "react";
+﻿import React, { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { FaCommentDots, FaTimes } from "react-icons/fa";
-
-const API_BASE_URL = "http://localhost:3000/api";
+import { submitFeedback } from "../src/services/feedbackService";
 
 const FeedbackWidget = ({ showFloating = true, renderTrigger = null }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -14,7 +13,7 @@ const FeedbackWidget = ({ showFloating = true, renderTrigger = null }) => {
   const [showToast, setShowToast] = useState(false);
   const toastTimeoutRef = useRef(null);
 
-  const token = localStorage.getItem("auth_token");
+  const token = localStorage.getItem("auth_token") || "";
   const storedEmail = localStorage.getItem("useremail") || "";
   const isLoggedIn = Boolean(token && storedEmail);
 
@@ -49,22 +48,12 @@ const FeedbackWidget = ({ showFloating = true, renderTrigger = null }) => {
     setSubmitting(true);
     setStatus("");
     try {
-      const response = await fetch(`${API_BASE_URL}/feedback${storedEmail ? `?email=${encodeURIComponent(storedEmail)}` : ""}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          ...(token ? { Authorization: `Bearer ${token}` } : {})
-        },
-        body: JSON.stringify({
-          type: "general",
-          message: message.trim(),
-          contact_email: isLoggedIn ? storedEmail : guestEmail.trim()
-        })
+      await submitFeedback({
+        message: message.trim(),
+        contactEmail: isLoggedIn ? storedEmail : guestEmail.trim(),
+        token,
+        email: storedEmail
       });
-
-      if (!response.ok) {
-        throw new Error("Failed to submit feedback");
-      }
 
       setMessage("");
       setGuestEmail("");

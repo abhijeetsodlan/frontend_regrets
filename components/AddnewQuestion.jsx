@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
+﻿import React, { useState, useEffect } from "react";
 import { FaTimes, FaUserSecret } from "react-icons/fa";
+import { createQuestion, getCategories } from "../src/services/questionService";
 
 export default function CreateQuestionModal({ onClose, onQuestionCreated }) {
   const [title, setTitle] = useState("");
@@ -14,9 +14,9 @@ export default function CreateQuestionModal({ onClose, onQuestionCreated }) {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await axios.get("http://localhost:3000/api/categories");
-        setCategories(response.data.data || []);
-      } catch (_err) {
+        const data = await getCategories();
+        setCategories(data.data || []);
+      } catch {
         setError("Failed to load categories.");
       } finally {
         setCategoriesLoading(false);
@@ -39,23 +39,15 @@ export default function CreateQuestionModal({ onClose, onQuestionCreated }) {
     }
 
     try {
-      const requestData = {
+      const data = await createQuestion({
         title,
-        category_id: parseInt(categoryId, 10)
-      };
-
-      if (isAnonymous) {
-        requestData.is_anonymous = 1;
-      }
-
-      const response = await axios.post("http://localhost:3000/api/question", requestData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          Accept: "application/json"
-        }
+        categoryId,
+        isAnonymous,
+        token
       });
-      if (onQuestionCreated && response.data?.question) {
-        onQuestionCreated(response.data.question);
+
+      if (onQuestionCreated && data?.question) {
+        onQuestionCreated(data.question);
       }
       onClose();
     } catch (err) {
