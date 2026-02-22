@@ -25,3 +25,21 @@ html.lenis body {
 .scrollbar-hide {
   scrollbar-width: none;
 }
+
+.night-room-bg {
+  background: linear-gradient(130deg, #03040b, #090d1e, #120c1d, #05060f);
+  background-size: 300% 300%;
+  animation: nightRoomGradient 45s ease-in-out infinite;
+}
+
+@keyframes nightRoomGradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}

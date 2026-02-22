@@ -13,6 +13,8 @@ import MyProfile from "./pages/myProfile";
 import ChooseAvatarPage from "./pages/chooseAvatar";
 import PrivacyPolicy from "./pages/privacyPolicy";
 import AdminPanel from "./pages/adminPanel";
+import NightRoomPage from "./pages/nightRoom";
+import NightRoomDetailPage from "./pages/nightRoomDetail";
 import SmoothScroll from "./SmoothScroll";
 import Navbar from "../components/navbar";
 import AuthSuccess from "../components/AuthSuccess";
@@ -95,6 +97,22 @@ function App() {
             element={
               <DefaultLayout>
                 <QuestionsPage />
+              </DefaultLayout>
+            }
+          />
+          <Route
+            path="/9-4-room"
+            element={
+              <DefaultLayout>
+                <NightRoomPage />
+              </DefaultLayout>
+            }
+          />
+          <Route
+            path="/9-4-room/:postId"
+            element={
+              <DefaultLayout>
+                <NightRoomDetailPage />
               </DefaultLayout>
             }
           />

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { FaBell, FaCommentDots } from "react-icons/fa";
+import { FaBell, FaCommentDots, FaDoorOpen, FaArrowLeft } from "react-icons/fa";
 import LoginModal from "./Login";
 import Logout from "./Logout"; // Import the Logout component
 import FeedbackWidget from "./FeedbackWidget";
@@ -24,6 +24,7 @@ const Navbar = () => {
   const [animateBell, setAnimateBell] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [isEnteringNightRoom, setIsEnteringNightRoom] = useState(false);
   const [profileAvatar, setProfileAvatar] = useState("");
   const [profileInitial, setProfileInitial] = useState("U");
   const menuRef = useRef(null);
@@ -311,6 +312,21 @@ const Navbar = () => {
     }
   };
 
+  const handleEnterNightRoom = () => {
+    setMenuOpen(false);
+    setNotificationsOpen(false);
+    if (isEnteringNightRoom) {
+      return;
+    }
+    setIsEnteringNightRoom(true);
+    setTimeout(() => {
+      navigate("/9-4-room");
+      setTimeout(() => setIsEnteringNightRoom(false), 260);
+    }, 360);
+  };
+
+  const isOnNightRoomRoute = location.pathname.startsWith("/9-4-room");
+
   return (
     <nav className="w-full bg-black/40 backdrop-blur-md text-white py-4 shadow-lg sticky top-0 z-50 border-b border-gray-700/50">
       <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
@@ -324,6 +340,28 @@ const Navbar = () => {
 
         {/* Right Side: User Icon or Login Button */}
         <div className="flex items-center gap-3">
+          {isOnNightRoomRoute ? (
+            <button
+              type="button"
+              onClick={() => navigate("/regrets")}
+              className="relative inline-flex h-10 w-10 items-center justify-center rounded-full border border-cyan-300/35 bg-cyan-500/10 text-cyan-100 transition hover:border-cyan-200/60 hover:bg-cyan-500/20"
+              aria-label="Back to regrets"
+              title="Back to regrets"
+            >
+              <FaArrowLeft size={14} />
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={handleEnterNightRoom}
+              className="relative inline-flex h-10 w-10 items-center justify-center rounded-full border border-cyan-300/35 bg-cyan-500/10 text-cyan-100 transition hover:border-cyan-200/60 hover:bg-cyan-500/20"
+              aria-label="Enter The 9-4 Room"
+              title="Enter The 9-4 Room"
+            >
+              <FaDoorOpen size={14} />
+            </button>
+          )}
+
           <FeedbackWidget
             showFloating={false}
             renderTrigger={(openFeedback) => (
@@ -465,6 +503,16 @@ const Navbar = () => {
         isOpen={loginModalOpen}
         onClose={() => setLoginModalOpen(false)}
       />
+
+      {isEnteringNightRoom && (
+        <div className="pointer-events-none fixed inset-0 z-[120] bg-gradient-to-b from-[#03040b] via-[#090d1e] to-[#120c1d] opacity-95 transition-opacity duration-500">
+          <div className="flex h-full w-full items-center justify-center text-cyan-100">
+            <div className="rounded-full border border-cyan-200/25 bg-cyan-500/10 px-5 py-2 text-sm tracking-wide">
+              Entering The 9-4 Room
+            </div>
+          </div>
+        </div>
+      )}
     </nav>
   );
 };

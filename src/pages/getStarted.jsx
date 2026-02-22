@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import SeoMeta from "../../components/SeoMeta";
+import { getNightRoomStatus } from "../services/nightRoomService";
 
 const regrets = [
   "Scaring off a woman who was as close to perfect as I'll ever get and was actually into me. Will probably die single now.",
@@ -57,6 +58,23 @@ const RegretCard = ({ text, className = "", compact = false }) => (
 );
 
 export default function GetStarted() {
+  const [isNightRoomOpen, setIsNightRoomOpen] = useState(false);
+
+  useEffect(() => {
+    const refreshNightRoomStatus = async () => {
+      try {
+        const data = await getNightRoomStatus();
+        setIsNightRoomOpen(Boolean(data.is_open));
+      } catch {
+        setIsNightRoomOpen(false);
+      }
+    };
+
+    refreshNightRoomStatus();
+    const intervalRef = setInterval(refreshNightRoomStatus, 60000);
+    return () => clearInterval(intervalRef);
+  }, []);
+
   return (
     <>
       <SeoMeta
@@ -128,6 +146,11 @@ export default function GetStarted() {
       </div>
 
       <div className="relative mx-auto w-full max-w-7xl">
+        {isNightRoomOpen && (
+          <div className="mx-auto mb-6 max-w-2xl rounded-2xl border border-cyan-300/30 bg-cyan-500/10 px-4 py-3 text-center text-sm text-cyan-100">
+            🌙 The 9–4 Room is open. <Link to="/9-4-room" className="underline">Enter now</Link>
+          </div>
+        )}
         <div className="relative flex min-h-[calc(100vh-6rem)] items-center justify-center sm:min-h-[560px] lg:min-h-[620px]">
           <div className="hidden lg:block">
             <div className="absolute left-0 top-0 z-10" style={{ animation: "floatSlowA 8s ease-in-out infinite" }}>
