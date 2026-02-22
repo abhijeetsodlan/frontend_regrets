@@ -321,8 +321,8 @@ const Navbar = () => {
     setIsEnteringNightRoom(true);
     setTimeout(() => {
       navigate("/9-4-room");
-      setTimeout(() => setIsEnteringNightRoom(false), 260);
-    }, 360);
+      setTimeout(() => setIsEnteringNightRoom(false), 420);
+    }, 560);
   };
 
   const isOnNightRoomRoute = location.pathname.startsWith("/9-4-room");
@@ -505,12 +505,13 @@ const Navbar = () => {
       />
 
       {isEnteringNightRoom && (
-        <div className="pointer-events-none fixed inset-0 z-[120] bg-gradient-to-b from-[#03040b] via-[#090d1e] to-[#120c1d] opacity-95 transition-opacity duration-500">
-          <div className="flex h-full w-full items-center justify-center text-cyan-100">
-            <div className="rounded-full border border-cyan-200/25 bg-cyan-500/10 px-5 py-2 text-sm tracking-wide">
-              Entering The 9-4 Room
-            </div>
-          </div>
+        <div className="night-room-enter pointer-events-none fixed inset-0 z-[120] overflow-hidden">
+          <div className="night-room-enter-bg absolute inset-0" />
+          <div className="night-room-enter-orb-a absolute -left-24 top-[18%] h-80 w-80 rounded-full" />
+          <div className="night-room-enter-orb-b absolute right-[-120px] top-[34%] h-[26rem] w-[26rem] rounded-full" />
+          <div className="night-room-enter-orb-c absolute bottom-[-120px] left-1/2 h-72 w-72 -translate-x-1/2 rounded-full" />
+          <div className="night-room-enter-sweep absolute inset-0" />
+          <div className="night-room-enter-vignette absolute inset-0" />
         </div>
       )}
     </nav>
