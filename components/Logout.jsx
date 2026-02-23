@@ -1,11 +1,9 @@
 import React from "react";
 import { createPortal } from "react-dom";
-import { useNavigate } from "react-router-dom";
 import { FaSignOutAlt } from "react-icons/fa";
 import { logoutRequest, requestCsrfCookie } from "../src/services/authService";
 
 const Logout = ({ onLogout }) => {
-  const navigate = useNavigate();
   const [isConfirmOpen, setIsConfirmOpen] = React.useState(false);
   const [isSubmitting, setIsSubmitting] = React.useState(false);
 
@@ -17,42 +15,32 @@ const Logout = ({ onLogout }) => {
   };
 
   const handleConfirmLogout = async () => {
+    if (isSubmitting) {
+      return;
+    }
     setIsSubmitting(true);
-    try {
-      const token = localStorage.getItem("auth_token");
-      if (!token) {
-        localStorage.removeItem("useremail");
-        setIsConfirmOpen(false);
-        navigate("/regrets", {
-          replace: true,
-          state: { logoutSuccess: true }
-        });
-        if (onLogout) onLogout();
-        return;
+
+    const token = localStorage.getItem("auth_token");
+    const storedEmail = localStorage.getItem("useremail");
+
+    // Complete local logout immediately so UI never gets stuck waiting on API.
+    localStorage.removeItem("auth_token");
+    localStorage.removeItem("useremail");
+    sessionStorage.setItem("logout_success", "1");
+    setIsConfirmOpen(false);
+    if (onLogout) {
+      onLogout(storedEmail || "");
+    }
+    setIsSubmitting(false);
+    window.location.assign("/regrets");
+
+    if (token) {
+      try {
+        await requestCsrfCookie();
+        await logoutRequest({ token });
+      } catch {
+        // Ignore backend logout errors; user is already logged out locally.
       }
-
-      await requestCsrfCookie();
-      await logoutRequest({ token });
-
-      localStorage.removeItem("auth_token");
-      localStorage.removeItem("useremail");
-      setIsConfirmOpen(false);
-      navigate("/regrets", {
-        replace: true,
-        state: { logoutSuccess: true }
-      });
-      if (onLogout) onLogout();
-    } catch {
-      localStorage.removeItem("auth_token");
-      localStorage.removeItem("useremail");
-      setIsConfirmOpen(false);
-      navigate("/regrets", {
-        replace: true,
-        state: { logoutSuccess: true }
-      });
-      if (onLogout) onLogout();
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
@@ -67,6 +55,7 @@ const Logout = ({ onLogout }) => {
 
       {isConfirmOpen && createPortal(
         <div
+          data-logout-modal="true"
           className="fixed inset-0 z-[110] flex items-center justify-center bg-black/70 px-4 backdrop-blur-sm"
           role="dialog"
           aria-modal="true"

@@ -236,9 +236,12 @@ const QuestionsPage = () => {
   }, []);
 
   useEffect(() => {
-    if (!location.state?.logoutSuccess) {
+    const hasStateSuccess = Boolean(location.state?.logoutSuccess);
+    const hasSessionSuccess = sessionStorage.getItem("logout_success") === "1";
+    if (!hasStateSuccess && !hasSessionSuccess) {
       return;
     }
+    sessionStorage.removeItem("logout_success");
     showSuccessToast("Logged out successfully");
     navigate(location.pathname, { replace: true, state: null });
   }, [location.pathname, location.state, navigate, showSuccessToast]);
