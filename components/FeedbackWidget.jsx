@@ -18,6 +18,9 @@ const FeedbackWidget = ({ showFloating = true, renderTrigger = null }) => {
   const isLoggedIn = Boolean(token && storedEmail);
 
   const closeModal = () => {
+    if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
     setIsOpen(false);
     setStatus("");
   };
@@ -116,7 +119,7 @@ const FeedbackWidget = ({ showFloating = true, renderTrigger = null }) => {
                   rows={5}
                   maxLength={1000}
                   required
-                  className="w-full resize-none rounded-xl border border-white/10 bg-slate-900/70 px-4 py-3 text-sm text-white outline-none transition placeholder:text-slate-500 focus:border-rose-300/50 focus:ring-2 focus:ring-rose-400/25"
+                  className="w-full resize-none rounded-xl border border-white/10 bg-slate-900/70 px-4 py-3 text-base text-white outline-none transition placeholder:text-slate-500 focus:border-rose-300/50 focus:ring-2 focus:ring-rose-400/25 sm:text-sm"
                 />
 
                 {!isLoggedIn && (
@@ -126,7 +129,7 @@ const FeedbackWidget = ({ showFloating = true, renderTrigger = null }) => {
                     onChange={(event) => setGuestEmail(event.target.value)}
                     placeholder="Your email (required)"
                     required
-                    className="w-full rounded-xl border border-white/10 bg-slate-900/70 px-4 py-3 text-sm text-white outline-none transition placeholder:text-slate-500 focus:border-rose-300/50 focus:ring-2 focus:ring-rose-400/25"
+                    className="w-full rounded-xl border border-white/10 bg-slate-900/70 px-4 py-3 text-base text-white outline-none transition placeholder:text-slate-500 focus:border-rose-300/50 focus:ring-2 focus:ring-rose-400/25 sm:text-sm"
                   />
                 )}
 
