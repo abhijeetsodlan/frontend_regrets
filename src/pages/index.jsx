@@ -14,13 +14,44 @@ import { buildWsUrl } from "../services/config";
 import { Link } from "react-router-dom";
 import { getNightRoomStatus } from "../services/nightRoomService";
 
+const PAGE_SIZE = 20;
+const FEED_CACHE_KEY = "regrets_feed_cache_v1";
+const FEED_CACHE_TTL_MS = 60 * 1000;
+
+function readFeedCache() {
+  try {
+    return JSON.parse(localStorage.getItem(FEED_CACHE_KEY) || "{}");
+  } catch {
+    return {};
+  }
+}
+
+function writeFeedCache(payload) {
+  try {
+    localStorage.setItem(FEED_CACHE_KEY, JSON.stringify(payload));
+  } catch {
+    // Ignore storage write errors.
+  }
+}
+
+function clearFeedCache() {
+  try {
+    localStorage.removeItem(FEED_CACHE_KEY);
+  } catch {
+    // Ignore storage clear errors.
+  }
+}
+
 const QuestionsPage = () => {
   const [questions, setQuestions] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [likes, setLikes] = useState({});
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [categories, setCategories] = useState([]);
   const [topRegretOfDay, setTopRegretOfDay] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
   const [showToast, setShowToast] = useState(false);
@@ -31,10 +62,141 @@ const QuestionsPage = () => {
   const toastTimeoutRef = useRef(null);
   const pullStartYRef = useRef(null);
   const isPullingRef = useRef(false);
+  const activeRequestRef = useRef(0);
+  const activeAbortRef = useRef(null);
+  const loadMoreAnchorRef = useRef(null);
 
   const navigate = useNavigate();
   const token = localStorage.getItem("auth_token");
   const storedEmail = localStorage.getItem("useremail");
+
+  const mergeLikesFromQuestions = useCallback((items) => {
+    setLikes((prev) => {
+      const next = { ...prev };
+      items.forEach((q) => {
+        next[q.id] = {
+          liked: q.liked_by_user || false,
+          count: q.likes_count || 0
+        };
+      });
+      return next;
+    });
+  }, []);
+
+  const applyFeedResponse = useCallback((data, { append }) => {
+    const fetchedQuestions = data.questions || [];
+    const pagination = data.pagination || {};
+    const nextHasMore = Boolean(pagination.has_more);
+    const nextPage = Number(pagination.page || 1);
+
+    setQuestions((prev) => {
+      if (!append) {
+        return fetchedQuestions;
+      }
+
+      const merged = [...prev];
+      const idSet = new Set(prev.map((row) => row.id));
+      fetchedQuestions.forEach((row) => {
+        if (!idSet.has(row.id)) {
+          merged.push(row);
+        }
+      });
+      return merged;
+    });
+    mergeLikesFromQuestions(fetchedQuestions);
+
+    setCurrentPage(nextPage);
+    setHasMore(nextHasMore);
+    if (!append) {
+      setTopRegretOfDay(data.top_regret_of_day || null);
+    }
+  }, [mergeLikesFromQuestions]);
+
+  const loadQuestionsPage = useCallback(async ({
+    category,
+    page,
+    append = false,
+    showPageLoader = false,
+    forceRefresh = false
+  }) => {
+    if (showPageLoader) {
+      setLoading(true);
+    }
+    if (append) {
+      setLoadingMore(true);
+    }
+
+    if (!append) {
+      if (activeAbortRef.current) {
+        activeAbortRef.current.abort();
+      }
+      activeAbortRef.current = new AbortController();
+    }
+
+    const requestId = ++activeRequestRef.current;
+    try {
+      if (!forceRefresh && page === 1) {
+        const cache = readFeedCache();
+        const cachedEntry = cache?.[category];
+        if (
+          cachedEntry &&
+          Date.now() - Number(cachedEntry.cached_at || 0) <= FEED_CACHE_TTL_MS
+        ) {
+          applyFeedResponse(cachedEntry.payload || {}, { append: false });
+          if (showPageLoader) {
+            setLoading(false);
+          }
+          return;
+        }
+      }
+
+      const data = await getQuestions({
+        category,
+        page,
+        limit: PAGE_SIZE,
+        token: token || "",
+        email: storedEmail || "",
+        signal: append ? undefined : activeAbortRef.current?.signal
+      });
+
+      if (requestId !== activeRequestRef.current) {
+        return;
+      }
+
+      applyFeedResponse(data, { append });
+
+      if (page === 1) {
+        const cache = readFeedCache();
+        cache[category] = { cached_at: Date.now(), payload: data };
+        writeFeedCache(cache);
+      }
+    } catch {
+      if (!append) {
+        setQuestions([]);
+        setTopRegretOfDay(null);
+        setHasMore(false);
+      }
+    } finally {
+      if (requestId === activeRequestRef.current) {
+        if (showPageLoader) {
+          setLoading(false);
+        }
+        if (append) {
+          setLoadingMore(false);
+        }
+      }
+    }
+  }, [applyFeedResponse, storedEmail, token]);
+
+  const refreshFeed = useCallback(async ({ showPageLoader = true, forceRefresh = false } = {}) => {
+    await loadQuestionsPage({
+      category: selectedCategory,
+      page: 1,
+      append: false,
+      showPageLoader,
+      forceRefresh
+    });
+  }, [loadQuestionsPage, selectedCategory]);
 
   useEffect(() => {
     getCategories({ token: token || "", email: storedEmail || "" })
@@ -57,47 +219,9 @@ const QuestionsPage = () => {
     return () => clearInterval(intervalRef);
   }, []);
 
-  const loadQuestions = useCallback(async ({ showPageLoader = true } = {}) => {
-    if (showPageLoader) {
-      setLoading(true);
-    }
-    try {
-      const data = await getQuestions({
-        category: selectedCategory,
-        token: token || "",
-        email: storedEmail || ""
-      });
-      const fetchedQuestions = data.questions || [];
-      setQuestions(fetchedQuestions);
-      if (selectedCategory === "All") {
-        setTopRegretOfDay(data.top_regret_of_day || null);
-      } else {
-        setTopRegretOfDay(null);
-      }
-      setLikes(
-        fetchedQuestions.reduce(
-          (acc, q) => ({
-            ...acc,
-            [q.id]: {
-              liked: q.liked_by_user || false,
-              count: q.likes_count || 0
-            }
-          }),
-          {}
-        )
-      );
-    } catch {
-      setQuestions([]);
-    } finally {
-      if (showPageLoader) {
-        setLoading(false);
-      }
-    }
-  }, [selectedCategory, token, storedEmail]);
-
   useEffect(() => {
-    loadQuestions();
-  }, [loadQuestions]);
+    refreshFeed({ showPageLoader: true });
+  }, [refreshFeed]);
 
   const handleCategoryClick = useCallback((categoryId) => {
     setSelectedCategory((prev) => (prev === categoryId ? prev : categoryId));
@@ -174,12 +298,13 @@ const QuestionsPage = () => {
     }));
   }, [selectedCategory]);
 
-  const handleQuestionCreated = useCallback((question) => {
+  const handleQuestionCreated = useCallback(async (question) => {
     setIsModalOpen(false);
+    clearFeedCache();
     upsertQuestionInFeed(question);
     showSuccessToast("Regret posted");
-    loadQuestions({ showPageLoader: false });
-  }, [loadQuestions, showSuccessToast, upsertQuestionInFeed]);
+    await refreshFeed({ showPageLoader: false, forceRefresh: true });
+  }, [refreshFeed, showSuccessToast, upsertQuestionInFeed]);
 
   const handleTouchStart = useCallback((event) => {
     if (window.innerWidth >= 640 || isRefreshing) {
@@ -225,11 +350,37 @@ const QuestionsPage = () => {
       if (navigator.vibrate) {
         navigator.vibrate(18);
       }
-      await loadQuestions({ showPageLoader: false });
+      clearFeedCache();
+      await refreshFeed({ showPageLoader: false, forceRefresh: true });
       setIsRefreshing(false);
     }
     setPullDistance(0);
-  }, [isRefreshing, loadQuestions, pullDistance]);
+  }, [isRefreshing, pullDistance, refreshFeed]);
+
+  useEffect(() => {
+    if (!loadMoreAnchorRef.current) {
+      return undefined;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const [entry] = entries;
+        if (!entry?.isIntersecting || loading || loadingMore || !hasMore) {
+          return;
+        }
+        loadQuestionsPage({
+          category: selectedCategory,
+          page: currentPage + 1,
+          append: true,
+          showPageLoader: false
+        });
+      },
+      { rootMargin: "220px 0px 220px 0px", threshold: 0.01 }
+    );
+
+    observer.observe(loadMoreAnchorRef.current);
+    return () => observer.disconnect();
+  }, [currentPage, hasMore, loadQuestionsPage, loading, loadingMore, selectedCategory]);
 
   useEffect(() => {
     if (!token) {
@@ -275,6 +426,10 @@ const QuestionsPage = () => {
       }
       if (toastTimeoutRef.current) {
         clearTimeout(toastTimeoutRef.current);
+      }
+      if (activeAbortRef.current) {
+        activeAbortRef.current.abort();
+        activeAbortRef.current = null;
       }
     };
   }, [token, upsertQuestionInFeed]);
@@ -345,7 +500,7 @@ const QuestionsPage = () => {
             to="/9-4-room"
             className="mb-4 block rounded-2xl border border-cyan-300/30 bg-cyan-500/10 px-4 py-3 text-sm text-cyan-100 transition hover:bg-cyan-500/20"
           >
-            🌙 The 9–4 Room is open.
+            🌙 The 9-4 Room is open.
           </Link>
         )}
 
@@ -477,6 +632,12 @@ const QuestionsPage = () => {
                 </div>
               </article>
             ))}
+            {loadingMore && (
+              <div className="rounded-2xl border border-white/10 bg-slate-900/45 px-4 py-4 text-center text-sm text-slate-300">
+                Loading more regrets...
+              </div>
+            )}
+            <div ref={loadMoreAnchorRef} className="h-2 w-full" />
           </div>
         )}
       </div>

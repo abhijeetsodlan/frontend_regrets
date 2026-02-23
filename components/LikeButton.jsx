@@ -35,18 +35,22 @@ const LikeButton = ({ questionId, likes, handleLike }) => {
         handleLike(e, questionId);
       }}
       aria-label={`Likes ${count}`}
-      className={`inline-flex h-10 w-10 items-center justify-center rounded-full border px-0 text-sm font-medium transition sm:w-auto sm:gap-2 sm:px-3 ${
-        liked
-          ? "border-rose-300/40 bg-rose-500/15 text-rose-200"
-          : "border-white/10 bg-slate-900/55 text-slate-300 hover:border-white/20 hover:bg-slate-800 hover:text-white"
-      }`}
+      className="inline-flex items-center gap-1.5 text-sm font-medium transition"
     >
-      <FaHeartBroken
-        size={14}
-        className={liked ? "text-rose-300" : ""}
-        style={{ transform: `scale(${iconScale})`, transition: "transform 220ms ease" }}
-      />
-      <span className="hidden sm:inline">{count}</span>
+      <span
+        className={`inline-flex h-10 w-10 items-center justify-center rounded-full border ${
+          liked
+            ? "border-rose-300/40 bg-rose-500/15 text-rose-200"
+            : "border-white/10 bg-slate-900/55 text-slate-300 hover:border-white/20 hover:bg-slate-800 hover:text-white"
+        }`}
+      >
+        <FaHeartBroken
+          size={14}
+          className={liked ? "text-rose-300" : ""}
+          style={{ transform: `scale(${iconScale})`, transition: "transform 220ms ease" }}
+        />
+      </span>
+      <span className="text-xs font-semibold tabular-nums text-slate-300 sm:text-sm">{count}</span>
     </button>
   );
 };
