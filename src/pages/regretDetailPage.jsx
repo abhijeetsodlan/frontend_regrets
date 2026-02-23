@@ -1,6 +1,6 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { FaHeartBroken, FaArrowLeft, FaPaperPlane, FaUserSecret } from "react-icons/fa";
+import { FaHeartBroken, FaArrowLeft, FaPaperPlane, FaSyncAlt, FaUserSecret } from "react-icons/fa";
 import SharePopup from "../../components/SharePopUp";
 import SeoMeta from "../../components/SeoMeta";
 import { createComment, getCommentsByQuestion } from "../services/commentService";
@@ -16,7 +16,11 @@ const RegretDetailPage = () => {
   const [comments, setComments] = useState([]);
   const [submittingReply, setSubmittingReply] = useState(false);
   const [likeIconScale, setLikeIconScale] = useState(1);
+  const [pullDistance, setPullDistance] = useState(0);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const likeAnimTimeoutRef = useRef(null);
+  const pullStartYRef = useRef(null);
+  const isPullingRef = useRef(false);
 
   const navigate = useNavigate();
   const token = localStorage.getItem("auth_token");
@@ -25,7 +29,10 @@ const RegretDetailPage = () => {
   const sortCommentsNewestFirst = (items = []) =>
     [...items].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 
-  const loadData = async () => {
+  const loadData = useCallback(async ({ showPageLoader = true } = {}) => {
+    if (showPageLoader) {
+      setLoading(true);
+    }
     try {
       const [questionRes, commentsRes] = await Promise.all([
         getQuestionDetails(regret_id, { token: token || "", email: storedEmail || "" }),
@@ -36,17 +43,20 @@ const RegretDetailPage = () => {
       setComments(sortCommentsNewestFirst(commentsRes.comments || []));
       setError(null);
     } catch {
-      setError("Failed to load regret details.");
+      if (showPageLoader) {
+        setError("Failed to load regret details.");
+      }
     } finally {
-      setLoading(false);
+      if (showPageLoader) {
+        setLoading(false);
+      }
     }
-  };
+  }, [regret_id, storedEmail, token]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
     loadData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [regret_id]);
+  }, [loadData, regret_id]);
 
   useEffect(() => {
     return () => {
@@ -112,6 +122,59 @@ const RegretDetailPage = () => {
     }
   };
 
+  const handleTouchStart = useCallback((event) => {
+    if (window.innerWidth >= 640 || isRefreshing || loading) {
+      return;
+    }
+    if (window.scrollY > 0) {
+      return;
+    }
+    pullStartYRef.current = event.touches[0].clientY;
+    isPullingRef.current = true;
+  }, [isRefreshing, loading]);
+
+  const handleTouchMove = useCallback((event) => {
+    if (!isPullingRef.current || pullStartYRef.current === null || isRefreshing) {
+      return;
+    }
+
+    const delta = event.touches[0].clientY - pullStartYRef.current;
+    if (delta <= 0) {
+      setPullDistance(0);
+      return;
+    }
+    if (window.scrollY > 0) {
+      isPullingRef.current = false;
+      setPullDistance(0);
+      return;
+    }
+
+    const nextDistance = Math.min(110, delta * 0.45);
+    setPullDistance(nextDistance);
+    event.preventDefault();
+  }, [isRefreshing]);
+
+  const handleTouchEnd = useCallback(async () => {
+    if (!isPullingRef.current) {
+      return;
+    }
+
+    isPullingRef.current = false;
+    pullStartYRef.current = null;
+
+    if (pullDistance >= 70 && !isRefreshing) {
+      setIsRefreshing(true);
+      setPullDistance(0);
+      if (navigator.vibrate) {
+        navigator.vibrate(18);
+      }
+      await loadData({ showPageLoader: false });
+      setIsRefreshing(false);
+    }
+
+    setPullDistance(0);
+  }, [isRefreshing, loadData, pullDistance]);
+
   const formatDate = (value) =>
     new Date(value).toLocaleDateString("en-GB", {
       day: "2-digit",
@@ -172,9 +235,29 @@ const RegretDetailPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-950 via-[#090b12] to-slate-950 px-4 py-8 text-white sm:py-10">
+    <div
+      className="min-h-screen bg-gradient-to-b from-slate-950 via-[#090b12] to-slate-950 px-4 py-8 text-white sm:py-10"
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+    >
       {seoMeta}
-      <div className="mx-auto w-full max-w-3xl">
+      {(pullDistance > 0 || isRefreshing) && (
+        <div
+          className="fixed left-1/2 top-16 z-[74] flex -translate-x-1/2 items-center justify-center rounded-full border border-white/10 bg-slate-900/85 p-2 text-slate-200 shadow-xl transition-all duration-150"
+          style={{
+            transform: `translate(-50%, ${Math.max(0, pullDistance - 50)}px) scale(${isRefreshing ? 1 : Math.min(1, 0.72 + pullDistance / 180)})`,
+            opacity: isRefreshing ? 1 : Math.min(1, pullDistance / 70)
+          }}
+        >
+          <FaSyncAlt className="animate-spin" size={18} />
+        </div>
+      )}
+
+      <div
+        className="mx-auto w-full max-w-3xl transition-transform duration-200 ease-out"
+        style={{ transform: `translateY(${isRefreshing ? 0 : pullDistance}px)` }}
+      >
         <button
           onClick={() => navigate(-1)}
           className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/10 bg-slate-900/60 px-4 py-2 text-sm text-slate-300 transition hover:border-white/20 hover:bg-slate-800 hover:text-white"

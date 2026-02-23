@@ -6,86 +6,65 @@ const ABHIJEET_IMAGE_URL =
 
 const Footer = () => {
   return (
-    <footer className="w-full backdrop-blur-xl bg-white/80 text-gray-800 py-12 border-t border-gray-300 shadow-md">
-      <div className="max-w-7xl mx-auto px-6">
-        {/* Top Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-10 mb-10">
-          {/* Brand Section */}
+    <footer className="w-full border-t border-gray-300 bg-white/80 py-12 text-gray-800 shadow-md backdrop-blur-xl">
+      <div className="mx-auto max-w-7xl px-6">
+        <div className="mb-10 grid grid-cols-1 gap-10 sm:grid-cols-2 md:grid-cols-4">
           <div>
-            <h2 className="text-3xl font-extrabold text-rose-500 mb-4">
-              Regrets.in
-            </h2>
-            <p className="text-sm text-gray-600 max-w-xs">
+            <h2 className="mb-4 text-3xl font-extrabold text-rose-500">Regrets.in</h2>
+            <p className="max-w-xs text-sm text-gray-600">
               Share your regrets. Read real stories. Connect with others - anonymously or openly.
             </p>
           </div>
 
-          {/* Quick Links */}
           <div>
-            <h3 className="text-md font-semibold mb-3">Quick Links</h3>
+            <h3 className="mb-3 text-md font-semibold">Quick Links</h3>
             <ul className="space-y-2 text-sm">
               <li>
-                <Link
-                  to="/regrets"
-                  className="hover:text-rose-500 transition duration-200"
-                >
+                <Link to="/regrets" className="transition duration-200 hover:text-rose-500">
                   Explore Regrets
                 </Link>
               </li>
               <li>
-                <a
-                  href="mailto:abhijeetsodlan7@gmail.com"
-                  className="hover:text-rose-500 transition duration-200"
-                >
+                <a href="mailto:abhijeetsodlan7@gmail.com" className="transition duration-200 hover:text-rose-500">
                   Support
                 </a>
               </li>
             </ul>
           </div>
 
-          {/* Legal */}
           <div>
-            <h3 className="text-md font-semibold mb-3">Legal</h3>
+            <h3 className="mb-3 text-md font-semibold">Legal</h3>
             <ul className="space-y-2 text-sm">
               <li>
-                <Link
-                  to="/privacy-policy"
-                  className="hover:text-rose-500 transition duration-200"
-                >
+                <Link to="/privacy-policy" className="transition duration-200 hover:text-rose-500">
                   Privacy Policy
                 </Link>
               </li>
             </ul>
           </div>
 
-          {/* Creator Info */}
           <div>
             <a
               href="https://abhijeethere.netlify.app"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center hover:opacity-90 transition duration-200"
+              className="flex items-center transition duration-200 hover:opacity-90"
             >
               <img
                 src={ABHIJEET_IMAGE_URL}
                 alt="Abhijeet Sodlan"
-                className="w-10 h-10 rounded-full border-2 border-rose-400 object-cover shadow-sm"
+                className="h-10 w-10 rounded-full border-2 border-rose-400 object-cover shadow-sm"
               />
               <p className="ml-3 text-sm text-gray-700">
-                Made by{" "}
-                <span className="font-semibold text-gray-900">
-                  Abhijeet Sodlan
-                </span>
+                {"\u0905\u092d\u093f\u091c\u0940\u0924 \u0938\u094b\u0921\u0932\u093e\u0928 \u0926\u094d\u0935\u093e\u0930\u093e \u0928\u093f\u0930\u094d\u092e\u093f\u0924 \u090f\u0935\u0902 \u0935\u093f\u0915\u0938\u093f\u0924"}
               </p>
             </a>
           </div>
         </div>
 
-        {/* Bottom Text */}
         <div className="border-t border-gray-300 pt-6 text-center text-xs text-gray-500">
-          © {new Date().getFullYear()} 
+          &copy; {new Date().getFullYear()}
         </div>
-        
       </div>
     </footer>
   );

@@ -5,9 +5,24 @@ export const getCategories = async ({ token = "", email = "" } = {}) => {
   return response.data;
 };
 
-export const getQuestions = async ({ category = "All", token = "", email = "" } = {}) => {
+export const getQuestions = async ({
+  category = "All",
+  page = 1,
+  limit = 20,
+  token = "",
+  email = "",
+  signal
+} = {}) => {
   const path = category === "All" ? "/questions" : `/questions/category/${category}`;
-  const response = await apiClient.get(path, buildAuthConfig({ token, email, includeEmail: Boolean(email) }));
+  const response = await apiClient.get(path, {
+    ...buildAuthConfig({
+      token,
+      email,
+      includeEmail: Boolean(email),
+      params: { page, limit }
+    }),
+    signal
+  });
   return response.data;
 };
 

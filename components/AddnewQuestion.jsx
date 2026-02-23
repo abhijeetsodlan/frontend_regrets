@@ -83,7 +83,7 @@ export default function CreateQuestionModal({ onClose, onQuestionCreated }) {
 
         {categoriesLoading ? (
           <div className="rounded-xl border border-white/10 bg-slate-900/60 p-4 text-sm text-slate-300">
-            Loading categories...
+            Loading filters...
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="relative space-y-4">
