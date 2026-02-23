@@ -6,11 +6,19 @@ const Logout = ({ onLogout }) => {
   const navigate = useNavigate();
 
   const handleLogout = async () => {
+    const confirmed = window.confirm("Are you sure you want to logout?");
+    if (!confirmed) {
+      return;
+    }
+
     try {
       const token = localStorage.getItem("auth_token");
       if (!token) {
         localStorage.removeItem("useremail");
-        navigate("/login");
+        navigate("/regrets", {
+          replace: true,
+          state: { logoutSuccess: true }
+        });
         if (onLogout) onLogout();
         return;
       }
@@ -20,12 +28,18 @@ const Logout = ({ onLogout }) => {
 
       localStorage.removeItem("auth_token");
       localStorage.removeItem("useremail");
-      navigate("/login");
+      navigate("/regrets", {
+        replace: true,
+        state: { logoutSuccess: true }
+      });
       if (onLogout) onLogout();
     } catch {
       localStorage.removeItem("auth_token");
       localStorage.removeItem("useremail");
-      navigate("/login");
+      navigate("/regrets", {
+        replace: true,
+        state: { logoutSuccess: true }
+      });
       if (onLogout) onLogout();
     }
   };

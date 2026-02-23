@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { FaUserSecret, FaSyncAlt, FaCrown } from "react-icons/fa";
 import CheckAuthModal from "../../components/CheckAuth";
 import SharePopup from "../../components/SharePopUp";
@@ -67,6 +67,7 @@ const QuestionsPage = () => {
   const loadMoreAnchorRef = useRef(null);
 
   const navigate = useNavigate();
+  const location = useLocation();
   const token = localStorage.getItem("auth_token");
   const storedEmail = localStorage.getItem("useremail");
 
@@ -222,6 +223,14 @@ const QuestionsPage = () => {
   useEffect(() => {
     refreshFeed({ showPageLoader: true });
   }, [refreshFeed]);
+
+  useEffect(() => {
+    if (!location.state?.logoutSuccess) {
+      return;
+    }
+    showSuccessToast("Logged out successfully");
+    navigate(location.pathname, { replace: true, state: null });
+  }, [location.pathname, location.state, navigate, showSuccessToast]);
 
   const handleCategoryClick = useCallback((categoryId) => {
     setSelectedCategory((prev) => (prev === categoryId ? prev : categoryId));
