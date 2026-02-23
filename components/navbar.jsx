@@ -178,6 +178,9 @@ const Navbar = () => {
     syncProfileButton();
 
     const handleClickOutside = (event) => {
+      if (event.target instanceof Element && event.target.closest('[data-logout-modal="true"]')) {
+        return;
+      }
       if (menuRef.current && !menuRef.current.contains(event.target)) {
         setMenuOpen(false);
       }
