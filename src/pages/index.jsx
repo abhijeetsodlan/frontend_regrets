@@ -224,6 +224,17 @@ const QuestionsPage = () => {
     refreshFeed({ showPageLoader: true });
   }, [refreshFeed]);
 
+  const showSuccessToast = useCallback((message) => {
+    setToastMessage(message);
+    setShowToast(true);
+    if (toastTimeoutRef.current) {
+      clearTimeout(toastTimeoutRef.current);
+    }
+    toastTimeoutRef.current = setTimeout(() => {
+      setShowToast(false);
+    }, 2200);
+  }, []);
+
   useEffect(() => {
     if (!location.state?.logoutSuccess) {
       return;
@@ -273,17 +284,6 @@ const QuestionsPage = () => {
     setIsModalOpen(false);
     setSelectedCategory((prev) => prev);
   };
-
-  const showSuccessToast = useCallback((message) => {
-    setToastMessage(message);
-    setShowToast(true);
-    if (toastTimeoutRef.current) {
-      clearTimeout(toastTimeoutRef.current);
-    }
-    toastTimeoutRef.current = setTimeout(() => {
-      setShowToast(false);
-    }, 2200);
-  }, []);
 
   const upsertQuestionInFeed = useCallback((question) => {
     if (!question?.id) {
