@@ -97,11 +97,11 @@ export default function CreateQuestionModal({ onClose, onQuestionCreated }) {
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 rows={4}
-                maxLength={300}
+                maxLength={3000}
                 className="w-full rounded-xl border border-white/10 bg-slate-900/70 px-4 py-3 text-base text-white outline-none transition placeholder:text-slate-500 focus:border-rose-300/50 focus:ring-2 focus:ring-rose-400/25"
                 required
               />
-              <div className="mt-1 text-right text-xs text-slate-500">{charCount}/300</div>
+              <div className="mt-1 text-right text-xs text-slate-500">{charCount}/3000</div>
             </div>
 
             <div>
